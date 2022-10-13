@@ -1,11 +1,11 @@
 from nerv.training import BaseParams
 
 
-class SlotAttentionParams(BaseParams):
+class SlotFormerParams(BaseParams):
     project = 'SlotFormer'
 
     # training settings
-    gpus = 1  # I actually use 2 to accelerate training
+    gpus = 2  # 1 GPU should also be good
     max_epochs = 30  # 370k iters
     save_interval = 0.2  # save every 0.2 epoch
     eval_interval = 2  # evaluate every 2 epochs
@@ -39,6 +39,11 @@ class SlotAttentionParams(BaseParams):
     # segmenting light-color objects, so we make the background black
     reverse_color = True
 
+    # our preliminary experiments show that batch size 32 is better than 64,
+    # which is the number used for other SAVi models
+    # so we stick to this value for all folds
+    # in Slot-Attention, randomness is necessary to trigger scene decomposition
+    # so using a larger batch size may reduce such randomness in the gradients
     train_batch_size = 32 // gpus
     val_batch_size = int(train_batch_size * 1.5)  # *2 causes OOM, weird...
     num_workers = 8

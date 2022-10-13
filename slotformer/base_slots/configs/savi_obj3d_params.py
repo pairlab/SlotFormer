@@ -1,11 +1,11 @@
 from nerv.training import BaseParams
 
 
-class SlotAttentionParams(BaseParams):
+class SlotFormerParams(BaseParams):
     project = 'SlotFormer'
 
     # training settings
-    gpus = 1  # I actually use 4 to accelerate training
+    gpus = 4  # 1 GPU should also be good
     max_epochs = 40  # ~80k steps
     save_interval = 0.2  # save every 0.2 epoch
     eval_interval = 2  # evaluate every 2 epochs

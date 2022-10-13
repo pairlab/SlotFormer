@@ -8,8 +8,8 @@ import torchvision.utils as vutils
 
 from nerv.training import BaseMethod, CosineAnnealingWarmupRestarts
 
-from slotformer.base_slots.models import cosine_anneal, get_lr, \
-    gumbel_softmax, make_one_hot, to_rgb_from_tensor
+from .models import cosine_anneal, get_lr, gumbel_softmax, make_one_hot, \
+    to_rgb_from_tensor
 
 
 def build_method(**kwargs):

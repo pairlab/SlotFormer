@@ -11,7 +11,7 @@ The code contains:
 
 ## Update
 
-- 2022.11: Initial code release!
+-   2022.11: Initial code release!
 
 ## Prerequisites
 
@@ -59,8 +59,8 @@ We use [wandb](https://wandb.ai/) for logging, please run `wandb login` to log i
 
 ## Experiments
 
-**This codebase is tailored to Slurm GPU clusters with pre-emption mechanism.
+**This codebase is tailored to Slurm GPU clusters with preemption mechanism.
 For the configs, we mainly use RTX6000 with 24GB memory (though many experiments don't require so much memory).
-Please modify the code accordingly if you are using other hardware settings.**
-
-
+Please modify the code accordingly if you are using other hardware settings**:
+- Please go through `scripts/train.py` and change the fields marked by `TODO:`
+- Please read the config file for the model you want to train. We use DDP with multiple GPUs to accelerate training. You can use less GPUs to achieve a better memory-speed trade-off
