@@ -12,16 +12,6 @@ def compact(l):
     return list(filter(None, l))
 
 
-def first(x):
-    return next(iter(x))
-
-
-def only(x):
-    materialized_x = list(x)
-    assert len(materialized_x) == 1
-    return materialized_x[0]
-
-
 class BaseTransforms(object):
     """Data pre-processing steps."""
 
