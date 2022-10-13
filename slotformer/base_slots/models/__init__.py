@@ -1,7 +1,7 @@
 from .savi_model import StoSAViModel
 from .dVAE import dVAE
 from .steve_model import STEVEModel
-from .utils import get_lr
+from .utils import get_lr, to_rgb_from_tensor
 from .steve_utils import cosine_anneal, gumbel_softmax, make_one_hot
 
 

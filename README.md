@@ -55,6 +55,8 @@ pip install phyre==0.2.1  # please use the latest v0.2.1, since the task split s
 
 Finally, install this project by `pip install -e .`
 
+We use [wandb](https://wandb.ai/) for logging, please run `wandb login` to log in.
+
 ## Experiments
 
 **This codebase is tailored to Slurm GPU clusters with pre-emption mechanism.
