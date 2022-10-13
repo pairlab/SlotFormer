@@ -86,7 +86,7 @@ class PHYREDataset(Dataset):
         split,
         phyre_transform,
         seq_size=6,
-        offset=1,
+        frame_offset=1,
         fps=1,
         protocal='within',
         fold=0,
@@ -102,9 +102,9 @@ class PHYREDataset(Dataset):
         self.resolution = phyre_transform.resolution
 
         self.seq_size = seq_size
-        self.offset = offset
         self.fps = fps  # simulation fps
-        self.frame_offset = 1
+        self.frame_offset = frame_offset
+        assert self.frame_offset == 1, 'should modify fps instead'
 
         self.protocal = protocal  # 'within' or 'cross'
         self.fold = fold  # 0~9
@@ -140,7 +140,7 @@ class PHYREDataset(Dataset):
             need_images=True,
             need_featurized_objects=False,
         )
-        images = sim.images[::self.offset]
+        images = sim.images[::self.frame_offset]
         vid_len = min(len(images), video_len)
         images = fix_video_len(images, video_len)  # dup or crop to a fixed len
         frames = [
@@ -170,7 +170,7 @@ class PHYREDataset(Dataset):
             need_images=True,
             need_featurized_objects=False,
         )
-        images = sim.images[::self.offset]
+        images = sim.images[::self.frame_offset]
         vid_len = min(len(images), video_len)
         # get all non-static frames
         last_idx = get_last_moving_idx(images)
@@ -316,7 +316,7 @@ class PHYRESlotsDataset(PHYREDataset):
         split,
         phyre_transform,
         seq_size=6,
-        offset=1,
+        frame_offset=1,
         fps=1,
         protocal='within',
         fold=0,
@@ -331,7 +331,7 @@ class PHYRESlotsDataset(PHYREDataset):
             split=split,
             phyre_transform=phyre_transform,
             seq_size=seq_size,
-            offset=offset,
+            frame_offset=frame_offset,
             fps=fps,
             protocal=protocal,
             fold=fold,
@@ -355,7 +355,7 @@ class PHYRESlotsDataset(PHYREDataset):
     def _read_slots(self, idx, video_len=None):
         video_len = self.seq_size if video_len is None else video_len
         slots_path = os.path.join(self.slot_root, f'{idx:06d}.npy')
-        slots = np.load(slots_path).astype(np.float32)[::self.offset]
+        slots = np.load(slots_path).astype(np.float32)[::self.frame_offset]
         slots = np.ascontiguousarray(slots)
         vid_len = min(len(slots), video_len)
         slots = fix_video_len(slots, video_len)
@@ -394,7 +394,7 @@ def build_phyre_dataset(params, val_only=False):
         split='val',
         phyre_transform=BaseTransforms(params.resolution),
         seq_size=params.n_sample_frames,
-        offset=params.frame_offset,
+        frame_offset=params.frame_offset,
         fps=params.fps,
         protocal=params.phyre_protocal,
         fold=params.phyre_fold,
@@ -429,7 +429,7 @@ def build_phyre_slots_dataset(params, val_only=False):
         split='val',
         phyre_transform=BaseTransforms(params.resolution),
         seq_size=params.n_sample_frames,
-        offset=params.frame_offset,
+        frame_offset=params.frame_offset,
         fps=params.fps,
         protocal=params.phyre_protocal,
         fold=params.phyre_fold,
@@ -457,7 +457,7 @@ def build_phyre_rollout_slots_dataset(params, val_only=False):
         split='val',
         phyre_transform=BaseTransforms(params.resolution),
         seq_size=params.n_sample_frames,
-        offset=params.frame_offset,
+        frame_offset=params.frame_offset,
         fps=params.fps,
         protocal=params.phyre_protocal,
         fold=params.phyre_fold,

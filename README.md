@@ -9,6 +9,10 @@ The code contains:
 -   VQA task on Physion
 -   Planning task on PHYRE
 
+## Update
+
+- 2022.11: Initial code release!
+
 ## Prerequisites
 
 We recommend using [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) for environment setup:
@@ -50,3 +54,11 @@ pip install phyre==0.2.1  # please use the latest v0.2.1, since the task split s
 ```
 
 Finally, install this project by `pip install -e .`
+
+## Experiments
+
+**This codebase is tailored to Slurm GPU clusters with pre-emption mechanism.
+For the configs, we mainly use RTX6000 with 24GB memory (though many experiments don't require so much memory).
+Please modify the code accordingly if you are using other hardware settings.**
+
+

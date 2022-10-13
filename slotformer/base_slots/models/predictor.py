@@ -66,6 +66,9 @@ class RNNPredictorWrapper(Predictor):
         self.hidden_state = None
         self.out_projector = nn.Linear(hidden_size, input_size)
         self.sg_every = sg_every  # detach all inputs every certain steps
+        # in ICCV'21 PARTS (https://openaccess.thecvf.com/content/ICCV2021/papers/Zoran_PARTS_Unsupervised_Segmentation_With_Slots_Attention_and_Independence_Maximization_ICCV_2021_paper.pdf)
+        # they detach RNN states every 4 steps to avoid overfitting
+        # but we don't observe much difference in our experiments
 
     def forward(self, x):
         if self.sg_every is not None:

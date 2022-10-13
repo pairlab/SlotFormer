@@ -1,10 +1,9 @@
 vis/
+data/
 wandb/
 checkpoint/
 checkpoints/
-data/questions/
 .idea/
-data/*_embs.pkl
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

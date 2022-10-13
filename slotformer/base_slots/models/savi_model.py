@@ -110,7 +110,9 @@ class SlotAttention(nn.Module):
 
 
 class StoSAViModel(BaseModel):
-    """SA model with stochastic kernel and additional prior_slots head."""
+    """SA model with stochastic kernel and additional prior_slots head.
+    If loss_dict['kld_method'] = 'none', it becomes a standard SAVi model.
+    """
 
     def __init__(
         self,
@@ -144,7 +146,7 @@ class StoSAViModel(BaseModel):
         ),
         loss_dict=dict(
             use_post_recon_loss=True,
-            kld_method='var-0.01',
+            kld_method='var-0.01',  # 'none' to make it deterministic
         ),
         eps=1e-6,
     ):
