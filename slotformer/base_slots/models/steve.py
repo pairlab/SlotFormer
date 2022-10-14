@@ -4,7 +4,7 @@ from torch.nn import functional as F
 
 from nerv.training import BaseModel
 from .utils import torch_cat
-from .savi_model import SlotAttention, StoSAViModel
+from .savi import SlotAttention, StoSAVi
 from .dVAE import dVAE
 from .steve_transformer import STEVETransformerDecoder
 from .steve_utils import gumbel_softmax
@@ -73,7 +73,7 @@ class SlotAttentionWMask(SlotAttention):
         return slots, seg_mask
 
 
-class STEVEModel(StoSAViModel):
+class STEVE(StoSAVi):
     """SA model with TransformerDecoder predicting patch tokens."""
 
     def __init__(
@@ -103,7 +103,6 @@ class STEVEModel(StoSAViModel):
             dec_num_layers=4,
             dec_num_heads=4,
             dec_d_model=128,
-            use_img_recon_loss=False,
         ),
         pred_dict=dict(
             pred_rnn=True,
@@ -112,6 +111,9 @@ class STEVEModel(StoSAViModel):
             pred_num_heads=4,
             pred_ffn_dim=512,
             pred_sg_every=None,
+        ),
+        loss_dict=dict(
+            use_img_recon_loss=False,  # dVAE decoded img recon loss
         ),
         eps=1e-6,
     ):
@@ -126,12 +128,14 @@ class STEVEModel(StoSAViModel):
         self.enc_dict = enc_dict
         self.dec_dict = dec_dict
         self.pred_dict = pred_dict
+        self.loss_dict = loss_dict
 
         self._build_slot_attention()
         self._build_dvae()
         self._build_encoder()
         self._build_decoder()
         self._build_predictor()
+        self._build_loss()
 
         # a hack for only extracting slots
         self.testing = False
@@ -164,7 +168,9 @@ class STEVEModel(StoSAViModel):
         self.vocab_size = self.dvae_dict['vocab_size']
         self.down_factor = self.dvae_dict['down_factor']
         self.dvae = dVAE(vocab_size=self.vocab_size, img_channels=3)
-        ckp = torch.load(self.dvae_dict['dvae_ckp_path'], map_location='cpu')
+        ckp_path = self.dvae_dict['dvae_ckp_path']
+        assert ckp_path, 'Please provide pretrained dVAE weight'
+        ckp = torch.load(ckp_path, map_location='cpu')
         self.dvae.load_state_dict(ckp['state_dict'])
         # fix dVAE
         for p in self.dvae.parameters():
@@ -177,7 +183,6 @@ class STEVEModel(StoSAViModel):
         H, W = self.resolution
         self.h, self.w = H // self.down_factor, W // self.down_factor
         self.num_patches = self.h * self.w
-        assert self.dec_dict['dec_type'] == 'slate'
         max_len = self.num_patches - 1
         self.trans_decoder = STEVETransformerDecoder(
             vocab_size=self.vocab_size,
@@ -188,7 +193,9 @@ class STEVEModel(StoSAViModel):
             num_layers=self.dec_dict['dec_num_layers'],
         )
 
-        self.use_img_recon_loss = self.dec_dict['use_img_recon_loss']
+    def _build_loss(self):
+        """Loss calculation settings."""
+        self.use_img_recon_loss = self.loss_dict['use_img_recon_loss']
 
     def encode(self, img, prev_slots=None):
         """Encode from img to slots."""

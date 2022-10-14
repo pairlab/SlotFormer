@@ -109,7 +109,7 @@ class SlotAttention(nn.Module):
         return self.project_k.weight.device
 
 
-class StoSAViModel(BaseModel):
+class StoSAVi(BaseModel):
     """SA model with stochastic kernel and additional prior_slots head.
     If loss_dict['kld_method'] = 'none', it becomes a standard SAVi model.
     """
@@ -516,11 +516,6 @@ class StoSAViModel(BaseModel):
         masks = F.softmax(masks, dim=1)  # [B, num_slots, 1, H, W]
         recon_combined = torch.sum(recons * masks, dim=1)  # [B, 3, H, W]
         return recon_combined, recons, masks, slots
-
-    @torch.no_grad()
-    def calc_eval_loss(self, data_dict, out_dict):
-        """Loss computation in eval, we only care about reconstruction loss."""
-        return self.calc_train_loss(data_dict, out_dict)
 
     def calc_train_loss(self, data_dict, out_dict):
         """Compute loss that are general for SlotAttn models."""

@@ -70,11 +70,9 @@ class SlotFormerParams(BaseParams):
 
     # CNN Decoder
     dec_dict = dict(
-        dec_type='slate',
         dec_num_layers=4,
         dec_num_heads=4,
         dec_d_model=slot_size,
-        use_img_recon_loss=False,  # additional img recon loss via dVAE decoder
     )
 
     # Predictor
@@ -88,5 +86,9 @@ class SlotFormerParams(BaseParams):
     )
 
     # loss settings
+    loss_dict = dict(
+        use_img_recon_loss=False,  # additional img recon loss via dVAE decoder
+    )
+
     token_recon_loss_w = 1.
     img_recon_loss_w = 1.
