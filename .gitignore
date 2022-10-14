@@ -1,6 +1,12 @@
 vis/
-data/
 wandb/
+data/OBJ3D
+data/CLEVRER
+data/Physion
+data/PHYRE
+data/*.pkl
+pretrained/*/
+pretrained/*.pth
 checkpoint/
 checkpoints/
 .idea/

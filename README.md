@@ -59,9 +59,7 @@ We use [wandb](https://wandb.ai/) for logging, please run `wandb login` to log i
 
 ## Experiments
 
-### Important Notes
-
-**This codebase is tailored to Slurm GPU clusters with preemption mechanism.**
+**This codebase is tailored to [Slurm](https://slurm.schedmd.com/documentation.html) GPU clusters with preemption mechanism.**
 For the configs, we mainly use RTX6000 with 24GB memory (though many experiments don't require so much memory).
 Please modify the code accordingly if you are using other hardware settings:
 
@@ -70,9 +68,44 @@ Please modify the code accordingly if you are using other hardware settings:
     We use DDP with multiple GPUs to accelerate training.
     You can use less GPUs to achieve a better memory-speed trade-off
 
-**We provide a unified script `scripts/train.py` to train all models used in this project.**
-You should always call it in the root directory of this repo (i.e. calling `python scripts/train.py xxx`).
-
 ### Dataset Preparation
 
 Please refer to [data.md](docs/data.md) for steps to download and pre-process each dataset.
+
+### Pre-trained Models & Intermediate Data
+
+We provide some pre-trained weights and generated data (e.g. slots) used in our experiments.
+However, some data require you to re-generate using our scripts, because they are too large to upload.
+
+Please download the pre-trained weights from [Google drive]() and unzip them to `./pretrained/`.
+
+Please download [OBJ3D slots]() and [CLEVRER slots](), and put them under `./data/OBJ3D/` and `./data/CLEVRER/`, respectively.
+
+### Reproduce Results
+
+Please see [benchmark.md](docs/benchmark.md) for detailed instructions on how to reproduce our results in the paper.
+
+## Citation
+
+Please cite our paper if you find it useful in your research:
+
+```
+@article{wu2022slotformer,
+  title={SlotFormer: Unsupervised Visual Dynamics Simulation with Object-Centric Models},
+  author={Wu, Ziyi and Dvornik, Nikita and Greff, Klaus and Kipf, Thomas and Garg, Animesh},
+  journal={arXiv preprint arXiv:2210.05861},
+  year={2022}
+}
+```
+
+## Acknowledgement
+
+We thank the authors of [RPIN](https://github.com/HaozhiQi/RPIN) and [Aloe](https://github.com/deepmind/deepmind-research/tree/master/object_attention_for_reasoning) for opening source their wonderful works.
+
+## License
+
+SlotFormer is released under the MIT License. See the LICENSE file for more details.
+
+## Contact
+
+If you have any questions about the code, please contact Ziyi Wu dazitu616@gmail.com

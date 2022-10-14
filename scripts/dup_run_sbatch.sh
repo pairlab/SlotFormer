@@ -29,7 +29,7 @@ do
     params="${PARAMS:0:(-3)}-dup${repeat_idx}.py"
     cp $PARAMS $params
     job_name="${JOB_NAME}-dup${repeat_idx}"
-    cmd="./sbatch_run.sh $PARTITION $job_name $PY_FILE $DDP --params $params $PY_ARGS"
+    cmd="./scripts/sbatch_run.sh $PARTITION $job_name $PY_FILE $DDP --params $params $PY_ARGS"
     echo $cmd
     eval $cmd
 done
