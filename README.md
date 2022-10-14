@@ -4,7 +4,7 @@ This is the official PyTorch implementation for paper: [SlotFormer: Unsupervised
 The code contains:
 
 -   Training base object-centric slot models
--   Training SlotFormer dynamics models for video prediction task
+-   Video prediction task on OBJ3D and CLEVRER
 -   VQA task on CLEVRER
 -   VQA task on Physion
 -   Planning task on PHYRE
@@ -59,8 +59,20 @@ We use [wandb](https://wandb.ai/) for logging, please run `wandb login` to log i
 
 ## Experiments
 
-**This codebase is tailored to Slurm GPU clusters with preemption mechanism.
+### Important Notes
+
+**This codebase is tailored to Slurm GPU clusters with preemption mechanism.**
 For the configs, we mainly use RTX6000 with 24GB memory (though many experiments don't require so much memory).
-Please modify the code accordingly if you are using other hardware settings**:
-- Please go through `scripts/train.py` and change the fields marked by `TODO:`
-- Please read the config file for the model you want to train. We use DDP with multiple GPUs to accelerate training. You can use less GPUs to achieve a better memory-speed trade-off
+Please modify the code accordingly if you are using other hardware settings:
+
+-   Please go through `scripts/train.py` and change the fields marked by `TODO:`
+-   Please read the config file for the model you want to train.
+    We use DDP with multiple GPUs to accelerate training.
+    You can use less GPUs to achieve a better memory-speed trade-off
+
+**We provide a unified script `scripts/train.py` to train all models used in this project.**
+You should always call it in the root directory of this repo (i.e. calling `python scripts/train.py xxx`).
+
+### Dataset Preparation
+
+Please refer to [data.md](docs/data.md) for steps to download and pre-process each dataset.
