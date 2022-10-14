@@ -19,7 +19,6 @@ class STEVESlotFormer(SlotFormer):
                 slot_size=192,
             ),
             dvae_dict=dict(
-                dvae_type='dvae',
                 down_factor=4,
                 vocab_size=4096,
                 dvae_ckp_path='',

@@ -52,12 +52,11 @@ class SlotFormerParams(BaseParams):
         num_iterations=2,
     )
 
-    # dVAE
+    # dVAE tokenizer
     dvae_dict = dict(
-        dvae_type='dvae',
         down_factor=4,
         vocab_size=4096,
-        dvae_ckp_path='checkpoint/dvae_physion_params/model_20.pth',
+        dvae_ckp_path='pretrained/dvae_physion_params/model_20.pth',
     )
 
     # CNN Encoder
@@ -68,7 +67,7 @@ class SlotFormerParams(BaseParams):
         enc_norm='',
     )
 
-    # CNN Decoder
+    # TransformerDecoder
     dec_dict = dict(
         dec_num_layers=4,
         dec_num_heads=4,

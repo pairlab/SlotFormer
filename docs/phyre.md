@@ -8,21 +8,21 @@ Run the following command to train SAVi on PHYRE videos.
 Please launch 3 runs and select the best model weight.
 
 ```
-python scripts/train.py --task base_slots --params slotformer/base_slots/configs/savi_phyre_params.py --fp16 --ddp --cudnn
+python scripts/train.py --task base_slots --params slotformer/base_slots/configs/savi_phyre_params-fold0.py --fp16 --ddp --cudnn
 ```
 
 Note that, PHYRE follows a 10-fold evaluation protocol.
 So you'll need to **train 10 SAVi**, by modifying the `phyre_fold` value in the config file.
-We provide pre-trained SAVi weight on `fold0` as `pretrained/savi_phyre_params/model_30.pth`.
+We provide pre-trained SAVi weight on `fold0` as `pretrained/savi_phyre_params-fold0/model_30.pth`.
 
 Then, we'll need to extract slots and save them.
 Please go to the folder of [extract_phyre_slots.py](../slotformer/base_slots/extract_phyre_slots.py) and run:
 
 ```
-python extract_phyre_slots.py --params configs/savi_phyre_params.py --weight $WEIGHT --vid_len 11 --split -1
+python extract_phyre_slots.py --params configs/savi_phyre_params-fold0.py --weight $WEIGHT --vid_len 11 --split -1
 ```
 
-This will extract slots from PHYRE videos, and save them as `.npy` files under `$DATA_ROOT/PHYRE/slots/savi_phyre_params/$SETTING`.
+This will extract slots from PHYRE videos, and save them as `.npy` files under `$DATA_ROOT/PHYRE/slots/savi_phyre_params-fold0/$SETTING`.
 We cannot provide the slots because they are too large.
 
 -   `--vid_len 11` means we will extract slots up to 11 timesteps, this is because later when training SlotFormer, we will only rollout till timestep 11

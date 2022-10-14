@@ -23,7 +23,7 @@ class SlotFormerParams(BaseParams):
     dataset = 'phyre'
     data_root = './data/PHYRE'
     n_sample_frames = 6  # train on video clips of 6 frames
-    fps = 1  # this is actually 1/FPS, i.e. we sample 1 frame per second
+    fps = 1  # simulate 1 FPS
     video_len = 15 * fps  # fix the maximum length of a simulation
     frame_offset = 1  # useless, just for compatibility
     # PHYRE related settings

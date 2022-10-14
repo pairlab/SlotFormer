@@ -87,7 +87,6 @@ class STEVE(StoSAVi):
             num_iterations=2,
         ),
         dvae_dict=dict(
-            dvae_type='dvae',
             down_factor=4,
             vocab_size=4096,
             dvae_ckp_path='',
@@ -164,7 +163,6 @@ class STEVE(StoSAVi):
 
     def _build_dvae(self):
         # Build dVAE module
-        assert self.dvae_dict['dvae_type'] == 'dvae'
         self.vocab_size = self.dvae_dict['vocab_size']
         self.down_factor = self.dvae_dict['down_factor']
         self.dvae = dVAE(vocab_size=self.vocab_size, img_channels=3)

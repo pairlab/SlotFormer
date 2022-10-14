@@ -3,10 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from nerv.training import BaseModel
-from nerv.models import deconv_out_shape, deconv_norm_act
 
-from slotformer.base_slots.models import StoSAVi, \
-    gumbel_softmax, make_one_hot, dVAE, STEVETransformerDecoder
+from slotformer.base_slots.models import StoSAVi
 
 
 def get_sin_pos_enc(seq_len, d_model):
