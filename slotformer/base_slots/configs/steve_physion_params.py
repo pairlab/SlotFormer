@@ -11,7 +11,7 @@ class SlotFormerParams(BaseParams):
     max_epochs = 10  # ~460k steps
     save_interval = 0.05  # training is very slow, save every 0.05 epoch
     save_epoch_end = True  # save ckp at the end of every epoch
-    n_samples = 5  # visualization after each epoch
+    n_samples = 8  # Physion has 8 scenarios
 
     # optimizer settings
     # Adam optimizer, Cosine decay with Warmup

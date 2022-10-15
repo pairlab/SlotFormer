@@ -10,7 +10,7 @@ class SlotAttentionParams(BaseParams):
     save_interval = 0.125  # save every 0.125 epoch
     eval_interval = 2  # evaluate every 2 epochs
     save_epoch_end = True  # save ckp at the end of every epoch
-    n_samples = 5  # visualization after each epoch
+    n_samples = 8  # Physion has 8 scenarios
 
     # optimizer settings
     # Adam optimizer, Cosine decay with Warmup

@@ -37,10 +37,22 @@ class SlotBaseMethod(BaseMethod):
         return torch.cat([video, dup_video], dim=0)
 
     @staticmethod
-    def _pause_frame(video, N=3):
+    def _pause_frame(video, N=4):
         """Pause the video on the first frame by duplicating it"""
         dup_video = torch.stack([video[0]] * N, dim=0)
         return torch.cat([dup_video, video], dim=0)
+
+    def _convert_video(self, video, caption=None):
+        video = torch.cat(video, dim=2)  # [T, 3, B*H, L*W]
+        video = (video * 255.).numpy().astype(np.uint8)
+        return wandb.Video(video, fps=self.vis_fps, caption=caption)
+
+    @staticmethod
+    def _get_sample_idx(N, dst):
+        """Load videos uniformly from the dataset."""
+        N = N - 1 if len(dst) % N != 0 else N
+        sampled_idx = torch.arange(0, len(dst), len(dst) // N)
+        return sampled_idx
 
     @torch.no_grad()
     def validation_epoch(self, model, san_check_step=-1, sample_video=True):
@@ -73,6 +85,15 @@ class SlotBaseMethod(BaseMethod):
 
         return optimizer, (scheduler, 'step')
 
+    @property
+    def vis_fps(self):
+        # PHYRE
+        if 'phyre' in self.params.dataset.lower():
+            return 4
+        # OBJ3D, CLEVRER, Physion
+        else:
+            return 8
+
 
 class SAViMethod(SlotBaseMethod):
     """SAVi model training method."""
@@ -81,15 +102,12 @@ class SAViMethod(SlotBaseMethod):
         """Make a video of grid images showing slot decomposition."""
         # pause the video on the 1st frame in PHYRE
         if 'phyre' in self.params.dataset.lower():
-            imgs = self._pause_frame(imgs)
-            recon_combined = self._pause_frame(recon_combined)
-            recons = self._pause_frame(recons)
-            masks = self._pause_frame(masks)
+            imgs, recon_combined, recons, masks = [
+                self._pause_frame(x)
+                for x in [imgs, recon_combined, recons, masks]
+            ]
         # in PHYRE if the background is black, we scale the mask differently
-        if self.params.get('reverse_color', False):
-            scale = 0.
-        else:
-            scale = 1.
+        scale = 0. if self.params.get('reverse_color', False) else 1.
         # combine images in a way so we can display all outputs in one grid
         # output rescaled to be between 0 and 1
         out = to_rgb_from_tensor(
@@ -116,14 +134,7 @@ class SAViMethod(SlotBaseMethod):
         """model is a simple nn.Module, not warpped in e.g. DataParallel."""
         model.eval()
         dst = self.val_loader.dataset
-        # load videos from each task in PHYRE
-        if 'phyre' in self.params.dataset.lower():
-            N = self.params.n_samples
-            N = N - 1 if len(dst) % N != 0 else N
-            sampled_idx = torch.arange(0, len(dst), len(dst) // N)
-        # otherwise just pick the first N videos
-        else:
-            sampled_idx = torch.arange(self.params.n_samples)
+        sampled_idx = self._get_sample_idx(self.params.n_samples, dst)
         results, labels = [], []
         for i in sampled_idx:
             data_dict = dst.get_video(i.item())
@@ -140,14 +151,12 @@ class SAViMethod(SlotBaseMethod):
             results.append(save_video)
             labels.append(label)
 
-        video = torch.cat(results, dim=2)  # [T, 3, B*H, (num_slots+2)*W]
-        video = (video * 255.).numpy().astype(np.uint8)
         if all(lbl is not None for lbl in labels):
             caption = '\n'.join(
                 ['Success' if lbl == 1 else 'Fail' for lbl in labels])
         else:
             caption = None
-        wandb.log({'val/video': wandb.Video(video, fps=8, caption=caption)},
+        wandb.log({'val/video': self._convert_video(results, caption=caption)},
                   step=self.it)
         torch.cuda.empty_cache()
 
@@ -173,14 +182,7 @@ class dVAEMethod(SlotBaseMethod):
         """model is a simple nn.Module, not warpped in e.g. DataParallel."""
         model.eval()
         dst = self.val_loader.dataset
-        # in Physion, get one video per scenario (8 in total)
-        if 'physion' in self.params.dataset.lower():
-            num_data = len(dst.files)
-            sampled_idx = torch.from_numpy(
-                np.round(np.linspace(0, num_data - 1, 8))).long()
-        # otherwise just pick the first N videos
-        else:
-            sampled_idx = torch.arange(self.params.n_samples)
+        sampled_idx = self._get_sample_idx(self.params.n_samples, dst)
         results = []
         for i in sampled_idx:
             video = dst.get_video(i.item())['video'].float().to(self.device)
@@ -198,9 +200,7 @@ class dVAEMethod(SlotBaseMethod):
             save_video = self._make_video(video, recon_video)
             results.append(save_video)
 
-        video = torch.cat(results, dim=2)  # [T, 3, B*H, 2*W]
-        video = (video * 255.).numpy().astype(np.uint8)
-        wandb.log({'val/video': wandb.Video(video, fps=8)}, step=self.it)
+        wandb.log({'val/video': self._convert_video(results)}, step=self.it)
         torch.cuda.empty_cache()
 
     def _training_step_start(self):
@@ -333,14 +333,7 @@ class STEVEMethod(SlotBaseMethod):
         model.eval()
         model.testing = True  # we only want the slots
         dst = self.val_loader.dataset
-        # in Physion, get one video per scenario (8 in total)
-        if 'physion' in self.params.dataset.lower():
-            num_data = len(dst.files)
-            sampled_idx = torch.from_numpy(
-                np.round(np.linspace(0, num_data - 1, 8))).long()
-        # otherwise just pick the first N videos
-        else:
-            sampled_idx = torch.arange(self.params.n_samples)
+        sampled_idx = self._get_sample_idx(self.params.n_samples, dst)
         num_patches = model.num_patches
         n = int(num_patches**0.5)
         results, recon_results = [], []
@@ -389,13 +382,9 @@ class STEVEMethod(SlotBaseMethod):
             recon_results.append(save_video)
             torch.cuda.empty_cache()
 
-        video = torch.cat(results, dim=2)  # [T, 3, B*H, (num_slots+1)*W]
-        video = (video * 255.).numpy().astype(np.uint8)
-        log_dict = {'val/video': wandb.Video(video, fps=8)}
+        log_dict = {'val/video': self._convert_video(results)}
         if self.recon_video:
-            recon_video = torch.cat(recon_results, dim=2)
-            recon_video = (recon_video * 255.).numpy().astype(np.uint8)
-            log_dict['val/recon_video'] = wandb.Video(recon_video, fps=8)
+            log_dict['val/recon_video'] = self._convert_video(recon_results)
         wandb.log(log_dict, step=self.it)
         torch.cuda.empty_cache()
         model.testing = False
