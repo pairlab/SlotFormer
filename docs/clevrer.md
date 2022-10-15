@@ -69,8 +69,28 @@ Alternatively, we provide rollout slots as described in [benchmark.md](./benchma
 
 ### Train Aloe VQA model
 
-TODO:
+To train an Aloe model only on the observed slots (this is the baseline in our paper), run:
+
+```
+python scripts/train.py --task clevrer_vqa --params slotformer/clevrer_vqa/configs/aloe_clevrer_params.py --fp16 --ddp --cudnn
+```
+
+To train an Aloe model on both observed and explicitly unrolled slots, run:
+
+```
+python scripts/train.py --task clevrer_vqa --params slotformer/clevrer_vqa/configs/aloe_clevrer_params-rollout.py --fp16 --ddp --cudnn
+```
+
+All the settings, except the slots are the same in these two experiments.
+Alternatively, we also provide **pre-trained Aloe weight** as `pretrained/aloe_clevrer_params-rollout/model_400.pth`.
 
 ### Evaluate VQA results
 
-TODO:
+Finally, to evaluate the VQA model on the test set, please use [clevrer_submit.py](../slotformer/clevrer_vqa/clevrer_submit.py) and run:
+
+```
+python slotformer/clevrer_vqa/clevrer_submit.py --params slotformer/clevrer_vqa/configs/aloe_clevrer_params-rollout.py --weight $WEIGHT
+```
+
+This will save the results as `CLEVRER.json` under the same directory as the weight (we attach our result file as `pretrained/aloe_clevrer_params-rollout/CLEVRER.json`).
+You can submit it to the [evaluation server](https://eval.ai/web/challenges/challenge-page/667/overview) of CLEVRER as see the results.
