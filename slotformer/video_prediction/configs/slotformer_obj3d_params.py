@@ -1,7 +1,7 @@
 from nerv.training import BaseParams
 
 
-class SlotAttentionParams(BaseParams):
+class SlotFormerParams(BaseParams):
     project = 'SlotFormer'
 
     # training settings

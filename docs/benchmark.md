@@ -13,6 +13,17 @@ The basic experiment pipeline in this project are:
 -   In video prediction, directly evaluate the predicted frames and object masks/bboxes
 -   In VQA and planning tasks, train downstream task models over extracted and rollout slots
 
+## Pre-trained Models & Intermediate Data
+
+We provide some pre-trained weights and generated data (e.g. slots) used in our experiments [here](https://drive.google.com/drive/folders/15y21miKZsAVHOSQEZLbUBWRrsZzcd5QW?usp=sharing).
+However, some data require you to re-generate using our scripts, because they are too large to upload.
+
+Please download the pre-trained weights `pretrained.zip` and unzip them to `./pretrained/`.
+
+If you want to test the video prediction results on OBJ3D and CLEVRER, please download OBJ3D slots `slots/obj3d_slots.pkl`, and CLEVRER slots `slots/clevrer_slots.pkl`, and put them under `./data/OBJ3D/` and `./data/CLEVRER/`, respectively.
+
+If you want to test the VQA results on CLEVRER, please download the CLEVRER slots rollouted by SlotFormer `slots/rollout_clevrer_slots.pkl`, and put it under `./data/CLEVRER/`.
+
 ## Basic Usage
 
 **We provide a unified script `scripts/train.py` to train all models used in this project.**

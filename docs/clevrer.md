@@ -22,17 +22,31 @@ python extract_slots.py --params configs/stosavi_clevrer_params.py --weight $WEI
 
 This will extract slots from CLEVRER videos, and save them into a `.pkl` file (~13G).
 
-Alternatively, we also provide pre-computed slots which can be downloaded (see [README.md](../README.md)).
+Alternatively, we also provide pre-computed slots as described in [benchmark.md](./benchmark.md).
 
 ## Video prediction
 
 ### Train SlotFormer on CLEVRER slots
 
-TODO:
+Train a SlotFormer model on extracted slots by running:
+
+```
+python scripts/train.py --task video_prediction --params slotformer/video_prediction/configs/slotformer_clevrer_params.py --fp16 --ddp --cudnn
+```
+
+Alternatively, we provide **pre-trained SlotFormer weight** as `pretrained/slotformer_clevrer_params/model_80.pth`.
 
 ### Evaluate video prediction results
 
-TODO:
+To evaluate the video prediction task, please go to the folder of [test_vp.py](../slotformer/video_prediction/test_vp.py) and run:
+
+```
+python test_vp.py --params slotformer/video_prediction/configs/slotformer_clevrer_params.py --weight $WEIGHT
+```
+
+This will compute and print all the metrics.
+Besides, it will also save 10 videos for visualization under `vis/clevrer/$PARAMS/`.
+If you only want to do visualizations (i.e. not testing the metrics), simply use the `--save_num` args and set it to a positive value.
 
 ## VQA
 

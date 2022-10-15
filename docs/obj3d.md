@@ -22,14 +22,28 @@ python extract_slots.py --params configs/savi_obj3d_params.py --weight $WEIGHT -
 
 This will extract slots from OBJ3D videos, and save them into a `.pkl` file (~692M).
 
-Alternatively, we also provide pre-computed slots which can be downloaded (see [README.md](../README.md)).
+Alternatively, we also provide pre-computed slots as described in [benchmark.md](./benchmark.md).
 
 ## Video prediction
 
 ### Train SlotFormer on OBJ3D slots
 
-TODO:
+Train a SlotFormer model on extracted slots by running:
+
+```
+python scripts/train.py --task video_prediction --params slotformer/video_prediction/configs/slotformer_obj3d_params.py --fp16 --ddp --cudnn
+```
+
+Alternatively, we provide **pre-trained SlotFormer weight** as `pretrained/slotformer_obj3d_params/model_200.pth`.
 
 ### Evaluate SlotFormer in video prediction
 
-TODO:
+To evaluate the video prediction task, please go to the folder of [test_vp.py](../slotformer/video_prediction/test_vp.py) and run:
+
+```
+python test_vp.py --params slotformer/video_prediction/configs/slotformer_obj3d_params.py --weight $WEIGHT
+```
+
+This will compute and print all the metrics.
+Besides, it will also save 10 videos for visualization under `vis/obj3d/$PARAMS/`.
+If you only want to do visualizations (i.e. not testing the metrics), simply use the `--save_num` args and set it to a positive value.
