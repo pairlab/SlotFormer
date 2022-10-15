@@ -15,7 +15,7 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
 class PhysionDataset(Dataset):
-    """Physion dataset providing video frames."""
+    """Dataset for loading Physion videos."""
 
     def __init__(
         self,
@@ -181,12 +181,12 @@ class PhysionDataset(Dataset):
 
 
 class PhysionSlotsDataset(PhysionDataset):
-    """PhysionDataset providing pre-computed slots and video frames."""
+    """Dataset for loading Physion videos and pre-computed slots."""
 
     def __init__(
         self,
         data_root,
-        slots_path,
+        video_slots,
         split,
         tasks,
         physion_transform,
@@ -207,8 +207,8 @@ class PhysionSlotsDataset(PhysionDataset):
             subset=subset,
         )
 
-        # load pre-computed slots
-        self.video_slots = load_obj(slots_path)[split]
+        # pre-computed slots
+        self.video_slots = video_slots
         self.load_img = load_img
 
     def _rand_another(self, is_video=False):
@@ -252,12 +252,12 @@ class PhysionSlotsDataset(PhysionDataset):
 
 
 class PhysionSlotsLabelDataset(PhysionSlotsDataset):
-    """PhysionDataset providing pre-computed slots, videos and VQA labels."""
+    """Dataset for loading Physion videos, slots and VQA labels."""
 
     def __init__(
         self,
         data_root,
-        slots_path,
+        video_slots,
         split,
         tasks,
         physion_transform,
@@ -278,7 +278,7 @@ class PhysionSlotsLabelDataset(PhysionSlotsDataset):
 
         super().__init__(
             data_root=data_root,
-            slots_path=slots_path,
+            video_slots=video_slots,
             split=split,
             tasks=tasks,
             physion_transform=physion_transform,
@@ -412,9 +412,10 @@ def build_physion_slots_dataset(params, val_only=False):
     """Build Physion video dataset with slots."""
     subset = params.dataset.split('_')[-1]
     physion_transform = BaseTransforms(params.resolution)
+    slots = load_obj(params.slots_root)
     args = dict(
         data_root=params.data_root,
-        slots_path=params.slots_root,
+        video_slots=None,
         split='val',
         tasks=params.tasks,
         physion_transform=physion_transform,
@@ -426,11 +427,15 @@ def build_physion_slots_dataset(params, val_only=False):
     )
     if subset == 'test':
         args['split'] = 'test'
+        args['video_slots'] = slots['test']
         val_only = True
+    else:
+        args['video_slots'] = slots['val']
     val_dataset = PhysionSlotsDataset(**args)
     if val_only:
         return val_dataset
     args['split'] = 'train'
+    args['video_slots'] = slots['train']
     train_dataset = PhysionSlotsDataset(**args)
     # an ugly hack to find the path of pre-computed dVAE token_ids
     dvae_path = params.dvae_dict['dvae_ckp_path'].split('/')[1] if \
@@ -445,9 +450,10 @@ def build_physion_slots_label_dataset(params, val_only=False):
     """Build Physion video dataset with slots and labels."""
     subset = params.dataset.split('_')[-1]
     physion_transform = BaseTransforms(params.resolution)
+    slots = load_obj(params.slots_root)
     args = dict(
         data_root=params.data_root,
-        slots_path=params.slots_root,
+        video_slots=None,
         split='val',
         tasks=params.tasks,
         physion_transform=physion_transform,
@@ -458,10 +464,14 @@ def build_physion_slots_label_dataset(params, val_only=False):
     )
     if subset == 'test':
         args['split'] = 'test'
+        args['video_slots'] = slots['test']
         val_only = True
+    else:
+        args['video_slots'] = slots['val']
     val_dataset = PhysionSlotsLabelDataset(**args)
     if val_only:
         return val_dataset
     args['split'] = 'train'
+    args['video_slots'] = slots['train']
     train_dataset = PhysionSlotsLabelDataset(**args)
     return train_dataset, val_dataset

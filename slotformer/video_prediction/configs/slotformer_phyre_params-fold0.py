@@ -22,6 +22,7 @@ class SlotFormerParams(BaseParams):
     # data settings
     dataset = 'phyre_slots'
     data_root = './data/PHYRE'
+    slots_root = 'pretrained/savi_phyre_params-fold0/{}_slots.pkl'
     frame_offset = 1  # useless, just for compatibility
     fps = 1  # simulate 1 FPS
     n_sample_frames = (1 + 10) * fps  # 1 burn-in, 10 rollout

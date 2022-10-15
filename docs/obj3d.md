@@ -14,10 +14,10 @@ python scripts/train.py --task base_slots --params slotformer/base_slots/configs
 Alternatively, we provide **pre-trained SAVi weight** as `pretrained/savi_obj3d_params/model_40.pth`.
 
 Then, we'll need to extract slots and save them.
-Please go to the folder of [extract_slots.py](../slotformer/base_slots/extract_slots.py) and run:
+Please use [extract_slots.py](../slotformer/base_slots/extract_slots.py) and run:
 
 ```
-python extract_slots.py --params configs/savi_obj3d_params.py --weight $WEIGHT --save_path $SAVE_PATH (e.g. '$DATA_ROOT/OBJ3D/slots.pkl')
+python slotformer/base_slots/extract_slots.py --params slotformer/base_slots/configs/savi_obj3d_params.py --weight $WEIGHT --save_path $SAVE_PATH (e.g. './data/OBJ3D/slots.pkl')
 ```
 
 This will extract slots from OBJ3D videos, and save them into a `.pkl` file (~692M).
@@ -25,6 +25,8 @@ This will extract slots from OBJ3D videos, and save them into a `.pkl` file (~69
 Alternatively, we also provide pre-computed slots as described in [benchmark.md](./benchmark.md).
 
 ## Video prediction
+
+For the video prediction task, we train SlotFormer over slots, and then evaluate the generated frames' visual quality.
 
 ### Train SlotFormer on OBJ3D slots
 
@@ -38,10 +40,10 @@ Alternatively, we provide **pre-trained SlotFormer weight** as `pretrained/slotf
 
 ### Evaluate SlotFormer in video prediction
 
-To evaluate the video prediction task, please go to the folder of [test_vp.py](../slotformer/video_prediction/test_vp.py) and run:
+To evaluate the video prediction task, please use [test_vp.py](../slotformer/video_prediction/test_vp.py) and run:
 
 ```
-python test_vp.py --params slotformer/video_prediction/configs/slotformer_obj3d_params.py --weight $WEIGHT
+python slotformer/video_prediction/test_vp.py --params slotformer/video_prediction/configs/slotformer_obj3d_params.py --weight $WEIGHT
 ```
 
 This will compute and print all the metrics.

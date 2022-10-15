@@ -46,8 +46,9 @@ Other arguments include:
 -   `--cudnn`: enable cudnn benchmark
 -   `--local_rank`: this one is for DDP, don't change it
 
-**To evaluate the model performance, you might need to go to each task directory, and run the scripts there.**
-See the docs for each dataset below for more details.
+**When generating intermediate data (e.g. pre-computed video slots), we usually save them under the same directory as the dataset's root.**
+**When producing final results (e.g. video visualizations, VQA result files to submit), we usually save them under the same directory as the model weight used to generate them.**
+See the docs of each dataset below for more details.
 
 ## Scripts
 

@@ -12,7 +12,7 @@ from torch.utils.data._utils.collate import default_collate
 from nerv.utils import dump_obj, mkdir_or_exist
 
 from .models import build_model
-from .datasets import build_dataset
+from .datasets import build_dataset, build_clevrer_dataset
 
 
 @torch.no_grad()
@@ -48,6 +48,12 @@ def process_video(model):
     print(f'Processing {params.dataset} video train set...')
     train_slots = extract_video_slots(model, train_set)
 
+    # also extract test_set for CLEVRER
+    if params.dataset == 'clevrer':
+        test_set = build_clevrer_dataset(params, test_set=True)
+        print(f'Processing {params.dataset} video test set...')
+        test_slots = extract_video_slots(model, test_set)
+
     try:
         train_slots = {
             os.path.basename(train_set.files[i]): train_slots[i]
@@ -58,13 +64,33 @@ def process_video(model):
             for i in range(len(val_slots))
         }
         slots = {'train': train_slots, 'val': val_slots}
+
+        if params.dataset == 'clevrer':
+            test_slots = {
+                os.path.basename(test_set.files[i]): test_slots[i]
+                for i in range(len(test_slots))
+            }
+            slots['test'] = test_slots
+
         mkdir_or_exist(os.path.dirname(args.save_path))
         dump_obj(slots, args.save_path)
         print(f'Finish {params.dataset} video dataset, '
               f'train: {len(train_slots)}/{train_set.num_videos}, '
               f'val: {len(val_slots)}/{val_set.num_videos}')
+
+        if params.dataset == 'clevrer':
+            print(f'test: {len(test_slots)}/{test_set.num_videos}')
     except:
         pdb.set_trace()
+
+    # create soft link to the weight dir
+    if 'physion' in args.params:
+        ln_path = os.path.join(
+            os.path.dirname(args.weight), f'{args.subset}_slots.pkl')
+    else:
+        ln_path = os.path.join(
+            os.path.dirname(args.weight), 'slots.pkl')
+    os.system(r'ln -s {} {}'.format(args.save_path, ln_path))
 
 
 def process_test_video(model):
@@ -87,6 +113,11 @@ def process_test_video(model):
               f'test: {len(test_slots)}/{test_set.num_videos}')
     except:
         pdb.set_trace()
+
+    # create soft link to the weight dir
+    ln_path = os.path.join(
+            os.path.dirname(args.weight), 'test_slots.pkl')
+    os.system(r'ln -s {} {}'.format(args.save_path, ln_path))
 
 
 def main():

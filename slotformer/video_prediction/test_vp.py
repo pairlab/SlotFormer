@@ -222,7 +222,7 @@ def main(params):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Pretrain SlotAttn on CLEVR')
+    parser = argparse.ArgumentParser(description='Evaluate video prediction')
     parser.add_argument('--params', type=str, required=True)
     parser.add_argument(
         '--weight', type=str, required=True, help='load weight')

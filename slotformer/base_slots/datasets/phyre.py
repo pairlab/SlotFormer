@@ -308,6 +308,7 @@ class PHYREDataset(Dataset):
 
 
 class PHYRESlotsDataset(PHYREDataset):
+    """Dataset for loading PHYRE videos and pre-computed slots."""
 
     def __init__(
         self,
@@ -413,19 +414,9 @@ def build_phyre_dataset(params, val_only=False):
 
 def build_phyre_slots_dataset(params, val_only=False):
     """Build PHYRE video dataset with pre-computed slots."""
-    # by default, we store pre-computed slots under a folder
-    # which is named after the config file used to train the model
-    # we assume `dec_ckp_path` to be 'checkpoint/$CONFIG_NAME/xxx'
-    slot_root = os.path.join(
-        params.data_root,
-        'slots',
-        params.dec_dict['dec_ckp_path'].split('/')[1],
-        f'{params.phyre_protocal}-fold_{str(params.phyre_fold)}-{{}}-'
-        f'data_{str(params.data_ratio)}-pos_{str(params.pos_ratio)}',
-    )
     args = dict(
         data_root=params.data_root,
-        slot_root=slot_root.format('val'),
+        slot_root=params.slots_root.format('val'),
         split='val',
         phyre_transform=BaseTransforms(params.resolution),
         seq_size=params.n_sample_frames,
@@ -444,7 +435,7 @@ def build_phyre_slots_dataset(params, val_only=False):
     if val_only:
         return val_dataset
     args['split'] = 'train'
-    args['slot_root'] = slot_root.format('train')
+    args['slot_root'] = params.slots_root.format('train')
     train_dataset = PHYRESlotsDataset(**args)
     return train_dataset, val_dataset
 

@@ -283,7 +283,7 @@ class CLEVRERSlotsDataset(CLEVRERDataset):
     def __init__(
         self,
         data_root,
-        slots_path,
+        video_slots,
         clevrer_transforms,
         split='train',
         max_n_objects=6,
@@ -311,8 +311,8 @@ class CLEVRERSlotsDataset(CLEVRERDataset):
             filter_enter=filter_enter,
         )
 
-        # load pre-computed slots
-        self.video_slots = load_obj(slots_path)[split]
+        # pre-computed slots
+        self.video_slots = video_slots
 
     def _rand_another(self, is_video=False):
         """Random get another sample when encountering loading error."""
@@ -365,7 +365,7 @@ class CLEVRERSlotsDataset(CLEVRERDataset):
         return data_dict
 
 
-def build_clevrer_dataset(params, val_only=False):
+def build_clevrer_dataset(params, val_only=False, test_set=False):
     """Build CLEVRER video dataset."""
     args = dict(
         data_root=params.data_root,
@@ -378,6 +378,12 @@ def build_clevrer_dataset(params, val_only=False):
         load_mask=params.load_mask,
         filter_enter=params.filter_enter,
     )
+
+    if test_set:
+        assert not val_only
+        args['split'] = 'test'
+        return CLEVRERDataset(**args)
+
     val_dataset = CLEVRERDataset(**args)
     if val_only:
         return val_dataset
@@ -388,9 +394,10 @@ def build_clevrer_dataset(params, val_only=False):
 
 def build_clevrer_slots_dataset(params, val_only=False):
     """Build CLEVRER video dataset with pre-computed slots."""
+    slots = load_obj(params.slots_root)
     args = dict(
         data_root=params.data_root,
-        slots_path=params.slots_root,
+        video_slots=slots['val'],
         clevrer_transforms=BaseTransforms(params.resolution),
         split='val',
         max_n_objects=6,
@@ -405,5 +412,6 @@ def build_clevrer_slots_dataset(params, val_only=False):
     if val_only:
         return val_dataset
     args['split'] = 'train'
+    args['video_slots'] = slots['train']
     train_dataset = CLEVRERSlotsDataset(**args)
     return train_dataset, val_dataset

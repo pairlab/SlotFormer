@@ -18,7 +18,7 @@ def extract_phyre_video_slots(model, dataset):
     model.eval()
     slot_key = 'post_slots' if params.model == 'StoSAVi' else 'slots'
     save_root = os.path.join(
-        dataset.data_root,
+        args.save_path,
         'slots',
         os.path.basename(args.params),
         f'{dataset.protocal}-fold_{str(dataset.fold)}-{dataset.split}-'
@@ -27,13 +27,11 @@ def extract_phyre_video_slots(model, dataset):
     os.makedirs(save_root, exist_ok=True)
     torch.cuda.empty_cache()
 
-    # create soft link to 'checkpoint/$PARAMS' for training other models
+    # create soft link to the weight dir
     if args.split in [-1, 0]:
-        # 'checkpoint/$PARAMS/train_or_val_slots'
-        ln_path = os.path.join('checkpoint', os.path.basename(args.params),
-                               f'{str(dataset.split)}_slots')
-        if not os.path.exists(ln_path):
-            os.system(r'ln -s {} {}'.format(save_root, ln_path))
+        ln_path = os.path.join(
+            os.path.dirname(args.weight), f'{str(dataset.split)}_slots')
+        os.system(r'ln -s {} {}'.format(save_root, ln_path))
 
     # load subset of videos from the dataset
     dataset.vid_len = args.vid_len * dataset.fps
@@ -99,10 +97,16 @@ def main():
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Pretrain SlotAttn on CLEVR')
+    parser = argparse.ArgumentParser(description='Extract PHYRE slots')
     parser.add_argument('--params', type=str, required=True)
     parser.add_argument(
         '--weight', type=str, required=True, help='pretrained model weight')
+    parser.add_argument(
+        '--save_path',
+        type=str,
+        required=True,  # './data/PHYRE'
+        help='path to save slots',
+    )
     parser.add_argument('--vid_len', type=int, default=11)
     parser.add_argument('--split', type=int, default=-1)
     parser.add_argument('--total_split', type=int, default=10)

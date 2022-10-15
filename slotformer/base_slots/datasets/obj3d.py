@@ -125,7 +125,7 @@ class Obj3DSlotsDataset(Obj3DDataset):
     def __init__(
         self,
         data_root,
-        slots_path,
+        video_slots,
         split,
         obj3d_transform,
         n_sample_frames=16,
@@ -141,8 +141,8 @@ class Obj3DSlotsDataset(Obj3DDataset):
             video_len=video_len,
         )
 
-        # load pre-computed slots
-        self.video_slots = load_obj(slots_path)[split]
+        # pre-computed slots
+        self.video_slots = video_slots
 
     def _read_slots(self, idx):
         """Read video frames slots."""
@@ -196,9 +196,10 @@ def build_obj3d_dataset(params, val_only=False):
 
 def build_obj3d_slots_dataset(params, val_only=False):
     """Build OBJ3D video dataset with pre-computed slots."""
+    slots = load_obj(params.slots_root)
     args = dict(
         data_root=params.data_root,
-        slots_path=params.slots_root,
+        video_slots=slots['val'],
         split='val',
         obj3d_transform=BaseTransforms(params.resolution),
         n_sample_frames=params.n_sample_frames,
@@ -209,5 +210,6 @@ def build_obj3d_slots_dataset(params, val_only=False):
     if val_only:
         return val_dataset
     args['split'] = 'train'
+    args['video_slots'] = slots['train']
     train_dataset = Obj3DSlotsDataset(**args)
     return train_dataset, val_dataset
