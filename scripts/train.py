@@ -15,9 +15,16 @@ from nerv.training import BaseDataModule
 
 def main(params):
     # build datamodule
-    train_set, val_set = build_dataset(params)
+    datasets = build_dataset(params)
+    train_set, val_set = datasets[0], datasets[1]
+    collate_fn = datasets[2] if len(datasets) == 3 else None
     datamodule = BaseDataModule(
-        params, train_set=train_set, val_set=val_set, use_ddp=params.ddp)
+        params,
+        train_set=train_set,
+        val_set=val_set,
+        use_ddp=params.ddp,
+        collate_fn=collate_fn,
+    )
 
     # build model
     model = build_model(params)
