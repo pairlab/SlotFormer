@@ -6,7 +6,7 @@ from PIL import Image
 import torch
 from torch.utils.data import Dataset
 
-from nerv.utils import load_obj, glob_all, VideoReader, strip_suffix, read_img
+from nerv.utils import load_obj, VideoReader, strip_suffix, read_img
 
 from .utils import np_stack, np_concat, torch_stack, CLEVRTransforms
 

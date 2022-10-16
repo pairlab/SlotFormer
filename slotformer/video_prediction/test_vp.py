@@ -12,11 +12,11 @@ import torch
 from nerv.utils import AverageMeter, save_video
 from nerv.training import BaseDataModule
 
-from .vp_utils import pred_eval_step, postproc_mask, masks_to_boxes, \
+from vp_utils import pred_eval_step, postproc_mask, masks_to_boxes, \
     PALETTE_torch
-from .vp_vis import make_video, batch_draw_bbox
-from .models import build_model
-from .datasets import build_dataset
+from vp_vis import make_video, batch_draw_bbox
+from models import build_model
+from datasets import build_dataset
 
 import lpips
 
@@ -93,18 +93,14 @@ def get_output(params, out_dict):
 
     if params.model == 'SlotFormer':
         pred = out_dict['recon_combined']
-        gt_step_recon = out_dict['gt_slots_recon_combined']
         pred_mask = postproc_mask(out_dict['masks'])
-        gt_step_mask = postproc_mask(out_dict['gt_slots_masks'])
         pred_bbox = masks_to_boxes(pred_mask, params.slot_dict['num_slots'])
     else:
         raise NotImplementedError(f'Unknown model: {params.model}')
 
     assert pred.shape[1] == rollout_len
-    assert gt_step_recon.shape[1] == history_len
     if pred_mask is not None:
         assert pred_mask.shape[1] == rollout_len
-        assert gt_step_mask.shape[1] == history_len
     if pred_bbox is not None:
         assert pred_bbox.shape[1] == rollout_len
 
@@ -159,6 +155,8 @@ def main(params):
             gt_pres_mask=gt_pres_mask,
             gt_bbox=gt_bbox,
             pred_bbox=pred_bbox,
+            # OBJ3D doesn't have object-level annotations
+            eval_traj='clevrer' in params.dataset.lower(),
         )
         for i in range(rollout_len):
             for m in metrics:

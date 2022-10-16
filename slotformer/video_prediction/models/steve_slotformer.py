@@ -68,8 +68,10 @@ class STEVESlotFormer(SlotFormer):
         self._build_dvae()
         # Build the same Transformer decoder as in STEVE
         STEVE._build_decoder(self)
+        # name it as `decoder` for consistency
         import copy
         self.decoder = copy.deepcopy(self.trans_decoder)  # TODO: better way?
+        del self.trans_decoder
         # load pretrained weight
         ckp_path = self.dec_dict['dec_ckp_path']
         assert ckp_path, 'Please provide pretrained Transformer decoder weight'

@@ -5,7 +5,7 @@ class SlotFormerParams(BaseParams):
     project = 'SlotFormer'
 
     # training settings
-    gpus = 4  # 1 GPU should also be good
+    gpus = 4  # 2 GPUs should also be good
     max_epochs = 12  # 230k steps
     save_interval = 0.2  # save every 0.2 epoch
     save_epoch_end = True  # save ckp at the end of every epoch
@@ -39,6 +39,7 @@ class SlotFormerParams(BaseParams):
         slot_size=128,
         slot_mlp_size=256,
         num_iterations=2,
+        kernel_mlp=False,
     )
 
     # CNN Encoder
@@ -59,7 +60,8 @@ class SlotFormerParams(BaseParams):
 
     # Predictor
     pred_dict = dict(
-        pred_rnn=True,
+        pred_type='mlp',  # less information fusion to avoid slots sharing objs
+        pred_rnn=False,
         pred_norm_first=True,
         pred_num_layers=2,
         pred_num_heads=4,

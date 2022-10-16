@@ -10,7 +10,7 @@ import phyre
 import torch
 from torch.utils.data import Dataset, DataLoader
 
-from .models import build_model
+from models import build_model
 from slotformer.base_slots.datasets.phyre import fix_video_len
 
 

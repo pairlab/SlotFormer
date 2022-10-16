@@ -8,8 +8,8 @@ from tqdm import tqdm
 import torch
 from torch.utils.data import DataLoader
 
-from .models import build_model
-from .datasets import build_dataset
+from models import build_model
+from datasets import build_dataset
 
 
 @torch.no_grad()

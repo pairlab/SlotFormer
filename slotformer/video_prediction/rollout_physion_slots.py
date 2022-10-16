@@ -12,8 +12,8 @@ import torch
 
 from nerv.utils import dump_obj, mkdir_or_exist
 
-from .models import build_model
-from .datasets import build_dataset
+from models import build_model
+from datasets import build_dataset
 
 OBS_FRAMES = int(30 * 1.5)  # 1.5s of the 30FPS video
 
@@ -156,7 +156,8 @@ if __name__ == "__main__":
         'should only be used to perform readout/testing on Physion dataset'
     assert args.subset in args.save_path, \
         'please include `subset` in `save_path` to differentiate slot files'
-    # switch to readout slots
+    # switch to $SUBSET slots
+    params.dataset = f'physion_slots_{args.subset}'
     slot_name = f'{args.subset}_slots.pkl'
     params.slots_root = os.path.join(
         os.path.dirname(params.slots_root), slot_name)

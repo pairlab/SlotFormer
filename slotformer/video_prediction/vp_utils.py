@@ -265,24 +265,24 @@ def pred_eval_step(
     gt_pres_mask=None,
     gt_bbox=None,
     pred_bbox=None,
+    eval_traj=True,
 ):
     """Both of shape [B, T, C, H, W], torch.Tensor.
     masks of shape [B, T, H, W].
     pres_mask of shape [B, T, N].
     bboxes of shape [B, T, N/M, 4].
 
+    eval_traj: whether to evaluate the trajectory (measured by bbox and mask).
+
     Compute metrics for every timestep.
     """
     assert len(gt.shape) == len(pred.shape) == 5
     assert gt.shape == pred.shape
     assert gt.shape[2] == 3
-    eval_mask = gt_mask is not None and pred_mask is not None
-    if eval_mask:
+    if eval_traj:
         assert len(gt_mask.shape) == len(pred_mask.shape) == 4
         assert gt_mask.shape == pred_mask.shape
-    eval_bbox = gt_pres_mask is not None and \
-        gt_bbox is not None and pred_bbox is not None
-    if eval_bbox:
+    if eval_traj:
         assert len(gt_pres_mask.shape) == 3
         assert len(gt_bbox.shape) == len(pred_bbox.shape) == 4
     T = gt.shape[1]
@@ -293,7 +293,7 @@ def pred_eval_step(
         one_gt, one_pred = gt[:, t], pred[:, t]
         percept_dist = perceptual_dist(one_gt, one_pred, lpips_fn).item()
         all_percept_dist.append(percept_dist)
-        if eval_mask:
+        if eval_traj:
             one_gt_mask, one_pred_mask = gt_mask[:, t], pred_mask[:, t]
             ari = ARI_metric(one_gt_mask, one_pred_mask)
             fari = fARI_metric(one_gt_mask, one_pred_mask)
@@ -309,7 +309,7 @@ def pred_eval_step(
     # compute bbox metrics
     all_ap, all_ar = [], []
     for t in range(T):
-        if not eval_bbox:
+        if not eval_traj:
             all_ap.append(0.)
             all_ar.append(0.)
             continue

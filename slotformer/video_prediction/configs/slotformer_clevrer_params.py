@@ -5,7 +5,7 @@ class SlotFormerParams(BaseParams):
     project = 'SlotFormer'
 
     # training settings
-    gpus = 4  # 1 GPU should also be good
+    gpus = 4  # 2 GPUs should also be good
     max_epochs = 80  # ~450k steps
     save_interval = 0.25  # save every 0.25 epoch
     eval_interval = 4  # evaluate every 4 epochs

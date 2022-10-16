@@ -1,4 +1,5 @@
 import os
+import sys
 import argparse
 import importlib
 import numpy as np
@@ -9,8 +10,8 @@ from torch.utils.data import DataLoader
 
 from nerv.utils import dump_obj
 
-from .models import build_model
-from .datasets import build_dataset
+from models import build_model
+from datasets import build_dataset
 
 
 def bool2str(v):
@@ -91,11 +92,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Aloe CLEVRER VQA')
     parser.add_argument('--params', type=str, required=True)
     parser.add_argument('--weight', type=str, required=True)
-
     args = parser.parse_args()
+
     if args.params.endswith('.py'):
         args.params = args.params[:-3]
-    params = importlib.import_module(args.params)
+    sys.path.append(os.path.dirname(args.params))
+    params = importlib.import_module(os.path.basename(args.params))
     params = params.SlotFormerParams()
 
     test_set, collate_fn = build_dataset(params, test_set=True)

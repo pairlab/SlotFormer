@@ -9,7 +9,8 @@ from nerv.training import BaseModel
 from nerv.models import deconv_out_shape, conv_norm_act, deconv_norm_act
 
 from .utils import assert_shape, SoftPositionEmbed, torch_cat
-from .predictor import TransformerPredictor, RNNPredictorWrapper
+from .predictor import ResidualMLPPredictor, TransformerPredictor, \
+    RNNPredictorWrapper
 
 
 class SlotAttention(nn.Module):
@@ -123,6 +124,7 @@ class StoSAVi(BaseModel):
             slot_size=128,
             slot_mlp_size=256,
             num_iterations=2,
+            kernel_mlp=True,
         ),
         enc_dict=dict(
             enc_channels=(3, 64, 64, 64, 64),
@@ -137,6 +139,7 @@ class StoSAVi(BaseModel):
             dec_norm='',
         ),
         pred_dict=dict(
+            pred_type='transformer',
             pred_rnn=True,
             pred_norm_first=True,
             pred_num_layers=2,
@@ -185,12 +188,16 @@ class StoSAVi(BaseModel):
             nn.init.normal_(torch.empty(1, self.num_slots, self.slot_size)))
 
         # predict the (\mu, \sigma) to sample the `kernels` input to SA
-        self.kernel_dist_layer = nn.Sequential(
-            nn.Linear(self.slot_size, self.slot_size * 2),
-            nn.LayerNorm(self.slot_size * 2),
-            nn.ReLU(),
-            nn.Linear(self.slot_size * 2, self.slot_size * 2),
-        )
+        if self.slot_dict.get('kernel_mlp', True):
+            self.kernel_dist_layer = nn.Sequential(
+                nn.Linear(self.slot_size, self.slot_size * 2),
+                nn.LayerNorm(self.slot_size * 2),
+                nn.ReLU(),
+                nn.Linear(self.slot_size * 2, self.slot_size * 2),
+            )
+        else:
+            self.kernel_dist_layer = nn.Sequential(
+                nn.Linear(self.slot_size, self.slot_size * 2), )
 
         # predict the `prior_slots`
         # useless, just for compatibility to load pre-trained weights
@@ -288,14 +295,21 @@ class StoSAVi(BaseModel):
     def _build_predictor(self):
         """Predictor as in SAVi to transition slot from time t to t+1."""
         # Build Predictor
+        pred_type = self.pred_dict.get('pred_type', 'transformer')
         # Transformer (object interaction) --> LSTM (scene dynamic)
-        self.predictor = TransformerPredictor(
-            self.slot_size,
-            self.pred_dict['pred_num_layers'],
-            self.pred_dict['pred_num_heads'],
-            self.pred_dict['pred_ffn_dim'],
-            norm_first=self.pred_dict['pred_norm_first'],
-        )
+        if pred_type == 'mlp':
+            self.predictor = ResidualMLPPredictor(
+                [self.slot_size, self.slot_size * 2, self.slot_size],
+                norm_first=self.pred_dict['pred_norm_first'],
+            )
+        else:
+            self.predictor = TransformerPredictor(
+                self.slot_size,
+                self.pred_dict['pred_num_layers'],
+                self.pred_dict['pred_num_heads'],
+                self.pred_dict['pred_ffn_dim'],
+                norm_first=self.pred_dict['pred_norm_first'],
+            )
         # wrap LSTM
         if self.pred_dict['pred_rnn']:
             self.predictor = RNNPredictorWrapper(
@@ -375,18 +389,13 @@ class StoSAVi(BaseModel):
         init_latents = self.init_latents.repeat(B, 1, 1)  # [B, N, C]
 
         # apply SlotAttn on video frames via reusing slots
-        all_kernel_dist, all_prior_slots, all_post_slots = [], [], []
+        all_kernel_dist, all_post_slots = [], []
         for idx in range(T):
             # init
             if prev_slots is None:
                 latents = init_latents  # [B, N, C]
             else:
                 latents = self.predictor(prev_slots)  # [B, N, C]
-
-            # predict `prior_slots`
-            # useless, just for compatibility
-            prior_slots = self.prior_slot_layer(latents)
-            all_prior_slots.append(prior_slots)
 
             # stochastic `kernels` as SA input
             kernel_dist = self.kernel_dist_layer(latents)
@@ -402,10 +411,9 @@ class StoSAVi(BaseModel):
 
         # (B, T, self.num_slots, self.slot_size)
         kernel_dist = torch.stack(all_kernel_dist, dim=1)
-        prior_slots = torch.stack(all_prior_slots, dim=1)
         post_slots = torch.stack(all_post_slots, dim=1)
 
-        return kernel_dist, prior_slots, post_slots, encoder_out
+        return kernel_dist, post_slots, encoder_out
 
     def _reset_rnn(self):
         self.predictor.reset()
@@ -467,12 +475,11 @@ class StoSAVi(BaseModel):
             self._reset_rnn()
 
         B, T = img.shape[:2]
-        kernel_dist, prior_slots, post_slots, encoder_out = \
+        kernel_dist, post_slots, encoder_out = \
             self.encode(img, prev_slots=prev_slots)
         # `slots` has shape: [B, T, self.num_slots, self.slot_size]
 
         out_dict = {
-            'prior_slots': prior_slots,  # [B, T, num_slots, C]
             'post_slots': post_slots,  # [B, T, num_slots, C]
             'kernel_dist': kernel_dist,  # [B, T, num_slots, 2C]
             'img': img,  # [B, T, 3, H, W]

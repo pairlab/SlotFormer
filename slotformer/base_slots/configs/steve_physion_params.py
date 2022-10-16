@@ -76,6 +76,7 @@ class SlotFormerParams(BaseParams):
 
     # Predictor
     pred_dict = dict(
+        pred_type='transformer',
         pred_rnn=True,
         pred_norm_first=True,
         pred_num_layers=2,

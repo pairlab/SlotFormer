@@ -375,7 +375,7 @@ def build_clevrer_dataset(params, val_only=False, test_set=False):
         n_sample_frames=params.n_sample_frames,
         warmup_len=params.input_frames,
         frame_offset=params.frame_offset,
-        load_mask=params.load_mask,
+        load_mask=params.get('load_mask', False),
         filter_enter=params.filter_enter,
     )
 
@@ -405,7 +405,7 @@ def build_clevrer_slots_dataset(params, val_only=False):
         warmup_len=params.input_frames,
         frame_offset=params.frame_offset,
         load_img=params.load_img,
-        load_mask=params.load_mask,
+        load_mask=params.get('load_mask', False),
         filter_enter=params.filter_enter,
     )
     val_dataset = CLEVRERSlotsDataset(**args)

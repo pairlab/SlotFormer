@@ -1,7 +1,7 @@
 import torch
 import torchvision.utils as vutils
 
-from .vp_utils import to_rgb_from_tensor, PALETTE
+from vp_utils import to_rgb_from_tensor, PALETTE
 
 
 def add_boundary(img, width=2, color='red'):

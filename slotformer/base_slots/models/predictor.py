@@ -44,6 +44,35 @@ class TransformerPredictor(Predictor):
         return out
 
 
+class ResidualMLPPredictor(Predictor):
+    """LN + residual MLP."""
+
+    def __init__(self, channels, norm_first=True):
+        super().__init__()
+
+        assert len(channels) >= 2
+        # since there is LN at the beginning of slot-attn
+        # so only use a pre-ln here
+        self.ln = nn.LayerNorm(channels[0])
+        modules = []
+        for i in range(len(channels) - 2):
+            modules += [nn.Linear(channels[i], channels[i + 1]), nn.ReLU()]
+        modules.append(nn.Linear(channels[-2], channels[-1]))
+        self.mlp = nn.Sequential(*modules)
+
+        self.norm_first = norm_first
+
+    def forward(self, x):
+        if not self.norm_first:
+            res = x
+        x = self.ln(x)
+        if self.norm_first:
+            res = x
+        out = self.mlp(x)
+        out = out + res
+        return out
+
+
 class RNNPredictorWrapper(Predictor):
     """Predictor wrapped in a RNN for sequential modeling."""
 

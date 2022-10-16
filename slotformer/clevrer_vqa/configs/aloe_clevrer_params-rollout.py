@@ -52,7 +52,7 @@ class SlotFormerParams(BaseParams):
     vision_dict = dict(vision_dim=slot_size, )
 
     # loss configs
-    loss_dict = dict(use_mask_obj_loss=False, ),
+    loss_dict = dict(use_mask_obj_loss=False, )
 
     cls_answer_loss_w = 1.
     mc_answer_loss_w = 1.

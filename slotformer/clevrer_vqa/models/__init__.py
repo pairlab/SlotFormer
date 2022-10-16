@@ -4,7 +4,7 @@ from .aloe import CLEVRERAloe
 from .transformer import CLEVRERTransformerModel
 
 
-def build_transformer_model(params):
+def build_transformer(params):
     """Build VQA Transformer model."""
     vocab = load_obj(params.vocab_file)
     lang_dict = dict(
@@ -24,6 +24,6 @@ def build_transformer_model(params):
 def build_model(params):
     """Build slot-based VQA model Aloe."""
     assert params.model == 'CLEVRERAloe', f'Unknown model: {params.model}'
-    transformer = build_transformer_model(params)
+    transformer = build_transformer(params)
     model = CLEVRERAloe(transformer_model=transformer)
     return model

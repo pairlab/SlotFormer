@@ -5,7 +5,7 @@ class SlotFormerParams(BaseParams):
     project = 'SlotFormer'
 
     # training settings
-    gpus = 2  # 1 GPU should also be good
+    gpus = 2
     max_epochs = 30  # 370k iters
     save_interval = 0.2  # save every 0.2 epoch
     eval_interval = 2  # evaluate every 2 epochs
@@ -79,6 +79,7 @@ class SlotFormerParams(BaseParams):
 
     # Predictor
     pred_dict = dict(
+        pred_type='transformer',
         pred_rnn=True,
         pred_norm_first=True,
         pred_num_layers=2,

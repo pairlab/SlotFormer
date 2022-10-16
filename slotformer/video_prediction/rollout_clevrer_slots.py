@@ -10,7 +10,7 @@ import torch
 
 from nerv.utils import load_obj, dump_obj, mkdir_or_exist
 
-from .models import build_model
+from models import build_model
 
 OBS_FRAMES = 128
 TARGET_LEN = 160

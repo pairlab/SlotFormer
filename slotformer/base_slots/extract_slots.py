@@ -11,8 +11,8 @@ from torch.utils.data._utils.collate import default_collate
 
 from nerv.utils import dump_obj, mkdir_or_exist
 
-from .models import build_model
-from .datasets import build_dataset, build_clevrer_dataset
+from models import build_model
+from datasets import build_dataset, build_clevrer_dataset
 
 
 @torch.no_grad()

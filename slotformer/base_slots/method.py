@@ -50,8 +50,9 @@ class SlotBaseMethod(BaseMethod):
     @staticmethod
     def _get_sample_idx(N, dst):
         """Load videos uniformly from the dataset."""
-        N = N - 1 if len(dst) % N != 0 else N
-        sampled_idx = torch.arange(0, len(dst), len(dst) // N)
+        dst_len = len(dst.files)  # treat each video as a sample
+        N = N - 1 if dst_len % N != 0 else N
+        sampled_idx = torch.arange(0, dst_len, dst_len // N)
         return sampled_idx
 
     @torch.no_grad()
