@@ -10,10 +10,10 @@ class SlotFormerParams(BaseParams):
     max_epochs = 50
     eval_interval = 5
     save_epoch_end = True  # save ckp at the end of every epoch
-    n_samples = 5  # visualization after each epoch
+    n_samples = 8  # visualization after each epoch
 
     # optimizer settings
-    # Adam optimizer, Cosine decay with Warmup
+    # Adam optimizer, Cosine decay without Warmup
     optimizer = 'Adam'
     lr = 1e-3
     warmup_steps_pct = 0.  # no warmup

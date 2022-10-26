@@ -32,8 +32,7 @@ class SlotFormerParams(BaseParams):
     phyre_protocal = 'within'
     phyre_fold = 0
     data_ratio = 0.1
-    pos_ratio = 0.2  # follow RPIN to use 20% positive actions
-    # make background black
+    pos_ratio = 0.2
     reverse_color = True
 
     train_batch_size = 64 // gpus
