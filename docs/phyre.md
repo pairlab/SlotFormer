@@ -11,7 +11,9 @@ Run the following command to train SAVi on PHYRE videos.
 Please launch 3 runs and select the best model weight.
 
 ```
-python scripts/train.py --task base_slots --params slotformer/base_slots/configs/savi_phyre_params-fold0.py --fp16 --ddp --cudnn
+python scripts/train.py --task base_slots \
+    --params slotformer/base_slots/configs/savi_phyre_params-fold0.py \
+    --fp16 --ddp --cudnn
 ```
 
 We provide pre-trained SAVi weight as `pretrained/savi_phyre_params-fold0/model_30.pth`.
@@ -20,7 +22,10 @@ Then, we'll need to extract slots and save them.
 Please use [extract_phyre_slots.py](../slotformer/base_slots/extract_phyre_slots.py) and run:
 
 ```
-python slotformer/base_slots/extract_phyre_slots.py --params slotformer/base_slots/configs/savi_phyre_params-fold0.py --weight $WEIGHT --save_path $SAVE_PATH (e.g. './data/PHYRE') --vid_len 11 --split -1
+python slotformer/base_slots/extract_phyre_slots.py \
+    --params slotformer/base_slots/configs/savi_phyre_params-fold0.py \
+    --weight $WEIGHT \
+    --save_path $SAVE_PATH (e.g. './data/PHYRE') --vid_len 11 --split -1
 ```
 
 This will extract slots from PHYRE videos, and save them as `.npy` files under `$SAVE_PATH/slots/savi_phyre_params-fold0/$SETTING`.
@@ -29,8 +34,17 @@ This will extract slots from PHYRE videos, and save them as `.npy` files under `
 -   `--split -1` means we don't parallel slot extraction.
     In fact, since PHYRE dataset is large, extracting slots using single process will take very long time.
     Therefore, you can manually parallelize it by specifying `--total_split` (e.g. 10) and `--split` (0, 1, ..., 9).
-    We also provide a script to parallelize it automatically if you use Slurm.
-    Take a look at [parallel_phyre.sh](../slotformer/base_slots/parallel_phyre.sh)
+    We also provide a script [parallel_phyre.sh](../scripts/parallel_phyre.sh) to parallelize it automatically if you use Slurm.
+    An example usage is
+    ```
+    CPUS_PER_TASK=4 ./scripts/parallel_phyre.sh $PARTITION \
+        slotformer/base_slots/extract_phyre_slots.py \
+        slotformer/base_slots/configs/savi_phyre_params-fold0.py \
+        $WEIGHT \
+        5 \
+        --save_path $SAVE_PATH --vid_len 11
+    ```
+    This will automatically run the above python command with `--split` equals to 0, 1, 2, 3, 4, i.e. parallelize the slot extraction by 5 processes.
 
 ## Planning
 
@@ -47,7 +61,9 @@ Specifically, we follow the below steps:
 Train a SlotFormer model on extracted slots by running:
 
 ```
-python scripts/train.py --task video_prediction --params slotformer/video_prediction/configs/slotformer_phyre_params-fold0.py --fp16 --cudnn
+python scripts/train.py --task video_prediction \
+    --params slotformer/video_prediction/configs/slotformer_phyre_params-fold0.py \
+    --fp16 --cudnn
 ```
 
 Alternatively, we provide **pre-trained SlotFormer weight** as `pretrained/slotformer_phyre_params-fold0/model_50.pth`.
@@ -59,19 +75,22 @@ To unroll videos, please use [rollout_phyre_slots.py](../slotformer/video_predic
 ```
 python slotformer/video_prediction/rollout_phyre_slots.py \
     --params slotformer/video_prediction/configs/slotformer_phyre_params-fold0.py \
-    --weight $WEIGHT --save_path $SAVE_PATH (e.g. './data/PHYRE') --vid_len 11 --split -1
+    --weight $WEIGHT \
+    --save_path $SAVE_PATH (e.g. './data/PHYRE') --vid_len 11 --split -1
 ```
 
 This will unroll slots from PHYRE videos, and save them as `.npy` files under `$SAVE_PATH/slots/slotformer_phyre_params-fold0/$SETTING`.
 
-Again, you can parallelize this process by setting different `--split`, or use the provided [parallel_phyre.sh](../slotformer/base_slots/parallel_phyre.sh) script.
+Again, you can parallelize this process by setting different `--split`, or use the provided [parallel_phyre.sh](../scripts/parallel_phyre.sh) script.
 
 ### Train task success classifier
 
 Train a task success classifier on rollout slots by running:
 
 ```
-python scripts/train.py --task phyre_planning --params slotformer/phyre_planning/configs/readout_phyre_params-fold0.py --fp16 --cudnn
+python scripts/train.py --task phyre_planning \
+    --params slotformer/phyre_planning/configs/readout_phyre_params-fold0.py \
+    --fp16 --cudnn
 ```
 
 This will train a Transformer-based binary classifier on rollout slots, to predict whether the action will lead to success.
@@ -98,14 +117,21 @@ python slotformer/phyre_planning/test_phyre_planning.py \
     --split -1
 ```
 
-Again, you can parallelize this process by setting different `--split`, or use the provided [parallel_phyre.sh](../slotformer/base_slots/parallel_phyre.sh) script.
+Again, you can parallelize this process by setting different `--split`, or use the provided [parallel_phyre.sh](../scripts/parallel_phyre.sh) script.
 
 The predicted success rate for all tasks and actions will be saved under `os.path.dirname($CLS_WEIGHT)/test/`.
 To merge them for computing the AUCCESS metric, simply run:
 
 ```
-python slotformer/phyre_planning/test_phyre_planning.py --collect os.path.dirname($CLS_WEIGHT) --total_split $NUM
+python slotformer/phyre_planning/test_phyre_planning.py \
+    --collect os.path.dirname($CLS_WEIGHT)/test/ --total_split $NUM
 ```
 
-**Note**: please select the best performing cls weight by looking at the `wandb` logs.
-Usually you can choose the checkpoint with the highest `val/acc_0.50` metric.
+**Note**:
+
+-   Please select the best performing cls weight by looking at the `wandb` logs.
+    Usually you can choose the checkpoint with the highest `val/acc_0.50` metric.
+    Similar to Physion, the readout model accuracy is also unstable.
+    So we usually train over three random seeds and select the one with the highest `val/acc_0.50` value
+-   The number reported in the paper is averaged over all 10 folds.
+    So you will need to repeat the above process on each fold

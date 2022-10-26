@@ -6,7 +6,7 @@
 
 #######################################################################
 # An example usage:
-#     GPUS=1 CPUS_PER_GPU=8 MEM_PER_CPU=5 QOS=normal ./sbatch_run.sh rtx6000 \
+#     GPUS=1 CPUS_PER_GPU=8 MEM_PER_CPU=5 QOS=normal ./scripts/sbatch_run.sh rtx6000 \
 #         test-sbatch test.py ddp --params params.py --fp16 --ddp --cudnn
 #######################################################################
 

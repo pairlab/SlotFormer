@@ -296,7 +296,9 @@ class PhysionSlotsLabelDataset(PhysionSlotsDataset):
         if subset == 'readout':
             return
         # filter out bad stimuli in test set
-        bad_stimuli = read_all_lines('datasets/splits/Physion/bad_stimuli.txt')
+        cur_dir = osp.dirname(osp.realpath(__file__))
+        bad_stimuli = read_all_lines(
+            os.path.join(cur_dir, 'splits/Physion/bad_stimuli.txt'))
         remove_files = []
         for file in self.files:
             file_to_check = file.replace('-redyellow', '')

@@ -108,7 +108,7 @@ if __name__ == "__main__":
         os.path.dirname(params.slots_root), 'test_slots.pkl')
     test_set = build_dataset(params)
 
-    all_w, all_acc, all_task_acc = [], [], [], []
+    all_w, all_acc, all_task_acc = [], [], []
     for thresh in args.threshs:
         print(f'Testing with threshold {thresh}')
         args.thresh = thresh

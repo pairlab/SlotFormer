@@ -21,7 +21,7 @@ class SlotFormerParams(BaseParams):
     # data settings
     dataset = 'physion_slots_label_readout'  # fit on readout set
     data_root = './data/Physion'
-    slots_root = './data/Physion/rollout_readout_slots.pkl'
+    slots_root = 'checkpoint/slotformer_physion_params/readout_slots.pkl'
     tasks = ['all']
     n_sample_frames = 6  # useless
     frame_offset = 1  # take all video frames

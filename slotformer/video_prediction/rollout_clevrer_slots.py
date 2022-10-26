@@ -118,7 +118,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '--save_path',
         type=str,
-        default='./data/clevrer/rollout_slots.pkl',
+        default='./data/CLEVRER/rollout_slots.pkl',
         help='path to save slots',
     )
     args = parser.parse_args()

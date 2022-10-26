@@ -122,7 +122,7 @@ class SingleStepSlotFormer(SlotFormer):
         if not (self.use_cls_loss and self.success_cls is not None):
             return out_dict
         pred_slots = out_dict['pred_slots']
-        past_slots = data_dict['gt_slots']
+        past_slots = out_dict['gt_slots']
         slots = torch.cat([past_slots, pred_slots], dim=1)
         vid_len = data_dict.get('vid_len', None)
         out_dict['logits'] = self.classify(slots, vid_len)
