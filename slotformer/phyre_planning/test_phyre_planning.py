@@ -187,7 +187,7 @@ def test(model, savi, dataset):
     # save results
     # if we're doing multi-split parallel testing, we will save the results to
     # temp files, and merge them using `collect_results()` later
-    save_path = os.path.join(os.path.dirname(args.weight), 'test_phyre')
+    save_path = os.path.join(os.path.dirname(args.task_cls_weight), 'test')
     os.makedirs(save_path, exist_ok=True)
     np.save(
         os.path.join(save_path, f'pred_conf-{args.split}.npy'), all_pred_conf)

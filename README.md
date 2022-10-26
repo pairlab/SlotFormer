@@ -11,7 +11,12 @@ The code contains:
 
 ## Update
 
--   2022.11: Initial code release!
+-   2022.10.16: Initial code release!
+    -   Support base object-centric model training
+    -   Support SlotFormer training
+    -   Support evaluation on the video prediction task
+    -   Support evaluation on the CLEVRER VQA task
+-   2022.10.26: Support Physion VQA task and PHYRE planning task
 
 ## Installation
 

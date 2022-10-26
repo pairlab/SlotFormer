@@ -271,7 +271,7 @@ class PHYREDataset(Dataset):
         num_pos = int(ratio * num_pos)
         num_neg = int(ratio * num_neg)
 
-        # TODO: keep the same random seed
+        # keep the same random seed
         np.random.seed(fold)
 
         self.video_info = np.zeros((0, 4))

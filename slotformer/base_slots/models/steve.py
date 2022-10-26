@@ -50,7 +50,7 @@ class SlotAttentionWMask(SlotAttention):
             attn = F.softmax(attn_logits, dim=-1)
             # `attn` has shape: [B, num_inputs, num_slots].
 
-            # TODO: attn_map normalized along slot-dim is seg_mask
+            # attn_map normalized along slot-dim is treated as seg_mask
             if attn_iter == self.num_iterations - 1:
                 seg_mask = attn.detach().clone().permute(0, 2, 1)
 

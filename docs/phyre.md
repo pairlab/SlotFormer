@@ -57,7 +57,9 @@ Alternatively, we provide **pre-trained SlotFormer weight** as `pretrained/slotf
 To unroll videos, please use [rollout_phyre_slots.py](../slotformer/video_prediction/rollout_phyre_slots.py) and run:
 
 ```
-python slotformer/video_prediction/rollout_phyre_slots.py --params slotformer/video_prediction/configs/slotformer_phyre_params-fold0.py --weight $WEIGHT --save_path $SAVE_PATH (e.g. './data/PHYRE') --vid_len 11 --split -1
+python slotformer/video_prediction/rollout_phyre_slots.py \
+    --params slotformer/video_prediction/configs/slotformer_phyre_params-fold0.py \
+    --weight $WEIGHT --save_path $SAVE_PATH (e.g. './data/PHYRE') --vid_len 11 --split -1
 ```
 
 This will unroll slots from PHYRE videos, and save them as `.npy` files under `$SAVE_PATH/slots/slotformer_phyre_params-fold0/$SETTING`.
@@ -66,8 +68,44 @@ Again, you can parallelize this process by setting different `--split`, or use t
 
 ### Train task success classifier
 
-TODO:
+Train a task success classifier on rollout slots by running:
+
+```
+python scripts/train.py --task phyre_planning --params slotformer/phyre_planning/configs/readout_phyre_params-fold0.py --fp16 --cudnn
+```
+
+This will train a Transformer-based binary classifier on rollout slots, to predict whether the action will lead to success.
 
 ### Evaluate planning results
 
-TODO:
+Finally, we can evaluate our models on the test set, which is the number we report in the paper.
+We will need three models in this evaluation:
+
+-   SAVi: extract slots from the initial frame (with different actions applied, i.e. placing the red ball with varying sizes at different locations)
+-   SlotFormer: rollout the slots from frame 0 to predict the scene dynamics
+-   Task success classifier: to predict whether the action will succeed, used in ranking all the candidate actions
+
+To do this, please use [test_phyre_planning.py](../slotformer/phyre_planning/test_phyre_planning.py) and run:
+
+```
+python slotformer/phyre_planning/test_phyre_planning.py \
+    --params slotformer/video_prediction/configs/slotformer_phyre_params-fold0.py \
+    --weight $SlotFormer_WEIGHT \
+    --task_cls_params slotformer/phyre_planning/configs/readout_phyre_params-fold0.py \
+    --task_cls_weight $CLS_WEIGHT \
+    --savi_params slotformer/base_slots/configs/savi_phyre_params-fold0.py \
+    --savi_weight $SAVi_WEIGHT \
+    --split -1
+```
+
+Again, you can parallelize this process by setting different `--split`, or use the provided [parallel_phyre.sh](../slotformer/base_slots/parallel_phyre.sh) script.
+
+The predicted success rate for all tasks and actions will be saved under `os.path.dirname($CLS_WEIGHT)/test/`.
+To merge them for computing the AUCCESS metric, simply run:
+
+```
+python slotformer/phyre_planning/test_phyre_planning.py --collect os.path.dirname($CLS_WEIGHT) --total_split $NUM
+```
+
+**Note**: please select the best performing cls weight by looking at the `wandb` logs.
+Usually you can choose the checkpoint with the highest `val/acc_0.50` metric.

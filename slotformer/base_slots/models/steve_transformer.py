@@ -316,7 +316,7 @@ class STEVETransformerDecoder(nn.Module):
             # predict one step
             logits = self.forward(slots, idx_cond)
             logits = logits[:, -1]  # [B, vocab_size]
-            # TODO: we have to do .cpu() to handle large number of tokens
+            # we have to do .cpu() to handle large number of tokens
             # luckily `generate` is only used for evaluation
             all_logits.append(logits.cpu())
             # apply softmax to convert to probabilities

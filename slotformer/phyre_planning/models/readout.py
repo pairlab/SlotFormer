@@ -105,7 +105,7 @@ class PHYREReadout(BaseModel):
         for thresh in acc_thresh:
             eq_mask = (pred_probs > thresh).eq(gt)
             acc = eq_mask.float().mean()
-            ret_dict['acc_{}'.format(thresh)] = acc
+            ret_dict[f'acc_{thresh:.2f}'] = acc
         return ret_dict
 
     @property
