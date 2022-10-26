@@ -97,7 +97,7 @@ class SingleStepSlotFormer(SlotFormer):
         super()._build_loss()
         # a hack, on PHYRE we'll equip SlotFormer with a task success cls model
         self.use_cls_loss = False
-        self.relation_mlp = None
+        self.success_cls = None
 
     def _build_rollouter(self):
         """Predictor as in SAVi to transition slot from time t to t+1."""
@@ -110,7 +110,7 @@ class SingleStepSlotFormer(SlotFormer):
         # only used in PHYRE eval
         assert not self.training
         # slots: [B, T, N, C]
-        logits = self.relation_mlp({
+        logits = self.success_cls({
             'slots': slots,
             'vid_len': vid_len,
         })['logits']
@@ -119,7 +119,7 @@ class SingleStepSlotFormer(SlotFormer):
     def forward(self, data_dict):
         """Forward pass."""
         out_dict = super().forward(data_dict)
-        if not (self.use_cls_loss and self.relation_mlp is not None):
+        if not (self.use_cls_loss and self.success_cls is not None):
             return out_dict
         pred_slots = out_dict['pred_slots']
         past_slots = data_dict['gt_slots']

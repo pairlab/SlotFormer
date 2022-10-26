@@ -87,7 +87,7 @@ def main(params):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Physion VQA')
+    parser = argparse.ArgumentParser(description='Test Physion VQA')
     parser.add_argument('--params', type=str, required=True)
     parser.add_argument('--weight', type=str, required=True)
     parser.add_argument(
