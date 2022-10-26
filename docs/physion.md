@@ -78,8 +78,27 @@ Please unroll for both `readout` and `test` subset.
 
 ### Train linear readout model
 
-TODO:
+Train a linear readout model on rollout slots in the `readout` subset by running:
+
+```
+python scripts/train.py --task physion_vqa --params slotformer/physion_vqa/configs/readout_physion_params.py --fp16 --cudnn
+```
+
+This will train a readout model that takes in slots extracted from a video, and predict whether two object-of-interests contact during the video.
 
 ### Evaluate VQA results
 
-TODO:
+Finally, we can evaluate the trained readout model on rollout slots in the `test` subset, which is the number we report in the paper.
+To do this, please use [test_physion_vqa.py](../slotformer/physion_vqa/test_physion_vqa.py) and run:
+
+```
+python slotformer/physion_vqa/test_physion_vqa.py --params slotformer/physion_vqa/configs/readout_physion_params.py --weight $WEIGHT
+```
+
+You can specify a single weight file to test, or a directory.
+If the later is provided, we will test all the weights under that directory, and report the best accuracy of all the models tested.
+You can also use the `--threshs ...` flag to specify different thresholds for binarizing the logits to 0/1 predictions.
+Again, if multiple thresholds are provided, we will test all of them and report the best one.
+
+**Note**: in our experiments, we noticed that the readout accuracy is not very stable.
+So we usually train over three random seeds (using `dup_run_sbatch.sh`), and report the best performance among them.
