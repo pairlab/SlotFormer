@@ -86,10 +86,10 @@ Alternatively, we also provide **pre-trained Aloe weight** as `pretrained/aloe_c
 
 ### Evaluate VQA results
 
-Finally, to evaluate the VQA model on the test set, please use [clevrer_submit.py](../slotformer/clevrer_vqa/clevrer_submit.py) and run:
+Finally, to evaluate the VQA model on the test set, please use [test_clevrer_vqa.py](../slotformer/clevrer_vqa/test_clevrer_vqa.py) and run:
 
 ```
-python slotformer/clevrer_vqa/clevrer_submit.py --params slotformer/clevrer_vqa/configs/aloe_clevrer_params-rollout.py --weight $WEIGHT
+python slotformer/clevrer_vqa/test_clevrer_vqa.py --params slotformer/clevrer_vqa/configs/aloe_clevrer_params-rollout.py --weight $WEIGHT
 ```
 
 This will save the results as `CLEVRER.json` under the same directory as the weight (we attach our result file as `pretrained/aloe_clevrer_params-rollout/CLEVRER.json`).

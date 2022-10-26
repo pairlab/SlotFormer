@@ -142,7 +142,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '--save_path',
         type=str,
-        default='./data/physion/rollout_readout_slots.pkl',
+        default='./data/Physion/rollout_readout_slots.pkl',
         help='path to save slots',
     )
     args = parser.parse_args()

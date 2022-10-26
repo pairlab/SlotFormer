@@ -22,7 +22,7 @@ class SlotFormerParams(BaseParams):
     # data settings
     dataset = 'physion_slots_training'
     data_root = './data/Physion'
-    slots_root = './data/Physion/TODO'
+    slots_root = './data/Physion/training_slots.pkl'
     tasks = ['all']  # train on all 8 scenarios
     n_sample_frames = 15 + 10  # 15 burn-in, 10 rollout
     frame_offset = 3  # subsample every 3 frames to increase difference

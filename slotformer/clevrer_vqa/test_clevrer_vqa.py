@@ -1,3 +1,5 @@
+"""Testing script for the CLEVRER VQA task."""
+
 import os
 import sys
 import argparse

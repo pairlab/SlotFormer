@@ -290,11 +290,8 @@ class PhysionSlotsLabelDataset(PhysionSlotsDataset):
         )
 
         # get sample index
-        self.sample_idx = []
-        sample_len = video_len // frame_offset
-        for i in range(frame_offset):
-            self.sample_idx.append(
-                list(range(i, video_len, frame_offset))[:sample_len])
+        assert frame_offset == 1
+        self.sample_idx = list(range(video_len))
 
         if subset == 'readout':
             return
@@ -316,12 +313,12 @@ class PhysionSlotsLabelDataset(PhysionSlotsDataset):
         another_idx = np.random.choice(len(self))
         return self.__getitem__(another_idx)
 
-    def _read_frames(self, file_idx, off_idx):
+    def _read_frames(self, file_idx):
         """Read the entire video."""
         folder = self.files[file_idx]
         frames = [
             Image.open(osp.join(folder, f'{i:06d}.jpg')).convert('RGB')
-            for i in self.sample_idx[off_idx]
+            for i in self.sample_idx
         ]
         # raise error if any frame is corrupted
         if any(frame is None for frame in frames):
@@ -329,11 +326,11 @@ class PhysionSlotsLabelDataset(PhysionSlotsDataset):
         frames = [self.physion_transform(img) for img in frames]
         return torch.stack(frames, dim=0).float()
 
-    def _read_slots(self, file_idx, off_idx):
+    def _read_slots(self, file_idx):
         """Read slots of the entire video."""
         folder = self.files[file_idx]
         slots = self.video_slots[os.path.basename(folder)]  # [T, N, C]
-        slots = [slots[i] for i in self.sample_idx[off_idx]]
+        slots = [slots[i] for i in self.sample_idx]
         return np.stack(slots, axis=0).astype(np.float32)
 
     def _read_label(self, file_idx):
@@ -358,13 +355,13 @@ class PhysionSlotsLabelDataset(PhysionSlotsDataset):
             - slots: [T, N, C] slots extracted from OBJ3D video frames
             - label: 1: success, 0: fail
         """
-        file_idx, off_idx = idx // self.frame_offset, idx % self.frame_offset
+        file_idx = idx
         try:
-            slots = self._read_slots(file_idx, off_idx)
+            slots = self._read_slots(file_idx)
             label = self._read_label(file_idx)
             data_dict = {'slots': slots, 'label': label}
             if self.load_img:
-                frames = self._read_frames(file_idx, off_idx)
+                frames = self._read_frames(file_idx)
                 data_dict['img'] = frames
         except ValueError:
             return self._rand_another()
@@ -374,7 +371,7 @@ class PhysionSlotsLabelDataset(PhysionSlotsDataset):
 
     def __len__(self):
         # one data is a (video, label) pair
-        return len(self.files) * self.frame_offset
+        return len(self.files)
 
 
 def build_physion_dataset(params, val_only=False):

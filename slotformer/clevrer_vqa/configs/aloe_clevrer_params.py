@@ -15,7 +15,7 @@ class SlotFormerParams(BaseParams):
 
     # optimizer settings
     # Adam optimizer, Cosine decay with Warmup
-    lr = 0.001
+    lr = 1e-3
     warmup_steps_pct = 0.1  # warmup in the first 10% of total steps
     # no weight decay, no gradient clipping
 
