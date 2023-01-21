@@ -1,6 +1,23 @@
 # SlotFormer
 
-This is the official PyTorch implementation for paper: [SlotFormer: Unsupervised Visual Dynamics Simulation with Object-Centric Models](https://arxiv.org/abs/2210.05861).
+[**SlotFormer: Unsupervised Visual Dynamics Simulation with Object-Centric Models**](https://slotformer.github.io/)<br/>
+[Ziyi Wu](https://wuziyi616.github.io/),
+[Nikita Dvornik](https://scholar.google.com/citations?user=UOLJQTIAAAAJ&hl=en),
+[Klaus Greff](https://qwlouse.github.io/),
+[Thomas Kipf](https://tkipf.github.io/),
+[Animesh Garg](https://animesh.garg.tech/)<br/>
+_[ICLR'23](https://openreview.net/forum?id=TFbwV6I0VLg) |
+[GitHub](https://github.com/Wuziyi616/SlotFormer) |
+[arXiv](https://arxiv.org/abs/2210.05861) |
+[Project page](https://slotformer.github.io/)_
+
+Ground-Truth &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Our Prediction | Ground-Truth &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Our Prediction
+:--------------------------------------------------:|:--------------------------------------------------: 
+![image](src/PHYRE-00021133.gif)  |  ![image](src/PHYRE-00007001.gif)
+
+## Introduction
+
+This is the official PyTorch implementation for paper: [SlotFormer: Unsupervised Visual Dynamics Simulation with Object-Centric Models](https://arxiv.org/abs/2210.05861), which is accepted by ICLR 2023.
 The code contains:
 
 -   Training base object-centric slot models
@@ -11,12 +28,13 @@ The code contains:
 
 ## Update
 
+-   2023.1.20: The paper is accepted by ICLR 2023!
+-   2022.10.26: Support Physion VQA task and PHYRE planning task
 -   2022.10.16: Initial code release!
     -   Support base object-centric model training
     -   Support SlotFormer training
     -   Support evaluation on the video prediction task
     -   Support evaluation on the CLEVRER VQA task
--   2022.10.26: Support Physion VQA task and PHYRE planning task
 
 ## Installation
 
