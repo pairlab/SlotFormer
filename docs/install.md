@@ -36,3 +36,8 @@ pip install phyre==0.2.2  # please use the v0.2.2, since the task split might sl
 Finally, install this project by `pip install -e .`
 
 We use [wandb](https://wandb.ai/) for logging, please run `wandb login` to log in.
+
+## Possible Issues
+
+-   In case you encounter any environmental issues, you can refer to the conda env file exported from my server [environment.yml](../environment.yml).
+    You can install the same environment by `conda env create -f environment.yml`.
