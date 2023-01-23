@@ -33,7 +33,14 @@ pip install einops==0.3.2  # tested on 0.3.2, other versions might also work
 pip install phyre==0.2.2  # please use the v0.2.2, since the task split might slightly differs between versions
 ```
 
-Finally, install this project by `pip install -e .`
+Finally, clone and install this project by:
+
+```
+cd ..  # move out from nerv/
+git clone git@github.com:pairlab/SlotFormer.git
+cd SlotFormer
+pip install -e .
+```
 
 We use [wandb](https://wandb.ai/) for logging, please run `wandb login` to log in.
 
