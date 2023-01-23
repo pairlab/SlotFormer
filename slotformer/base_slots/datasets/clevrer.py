@@ -77,21 +77,19 @@ class CLEVRERDataset(Dataset):
                 cap.get_frame(start_idx + n * self.frame_offset)
                 for n in range(self.n_sample_frames)
             ]
-            # raise error if any frame is corrupted
-            if any(frame is None for frame in frames):
+        else:
+            # otherwise, read from saved video frames
+            # wrong video length
+            if len(os.listdir(frame_dir)) != self.video_len:
                 raise ValueError
-            return frames
-        # otherwise, read from saved video frames
-        # wrong video length
-        if len(os.listdir(frame_dir)) != self.video_len:
-            raise ValueError
-        # read from jpg images
-        frames = [
-            read_img(
-                os.path.join(frame_dir,
-                             f'{start_idx + n * self.frame_offset:06d}.jpg'))
-            for n in range(self.n_sample_frames)
-        ]
+            # read from jpg images
+            frames = [
+                read_img(
+                    os.path.join(frame_dir,
+                                f'{start_idx + n * self.frame_offset:06d}.jpg'))
+                for n in range(self.n_sample_frames)
+            ]
+        # raise error if any frame is corrupted
         if any(frame is None for frame in frames):
             raise ValueError
         frames = [
