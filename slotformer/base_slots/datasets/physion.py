@@ -64,6 +64,8 @@ class PhysionDataset(Dataset):
 
     def _read_frames(self, idx):
         folder, start_idx = self._get_video_start_idx(idx)
+        # read frames saved from videos
+        assert osp.exists(folder), "Please extract frames from videos first."
         filename = osp.join(folder, '{:06d}.jpg')
         frames = [
             Image.open(filename.format(start_idx +
