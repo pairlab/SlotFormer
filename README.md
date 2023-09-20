@@ -28,6 +28,11 @@ The code contains:
 
 ## Update
 
+-   2023.9.20: BC-breaking change! We fix an error in the mIoU calculation code.
+               This won't change the order of benchmarked methods, but will change their absolute values.
+               See [this PR](https://github.com/pairlab/SlotFormer/pull/7) for more details.
+               Please re-run the evaluation code on your trained models to get the correct results.
+               The updated mIoU of SlotFormer on CLEVRER is **49.42** (using the provided pre-trained weight)
 -   2023.1.20: The paper is accepted by ICLR 2023!
 -   2022.10.26: Support Physion VQA task and PHYRE planning task
 -   2022.10.16: Initial code release!
