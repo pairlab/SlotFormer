@@ -229,7 +229,7 @@ def hungarian_miou(gt_mask, pred_mask):
     N, M = true_oh.shape[-1], pred_oh.shape[-1]
     # compute all pairwise IoU
     intersect = (true_oh[:, :, None] * pred_oh[:, None, :]).sum(0)  # [N, M]
-    union = true_oh.sum(0)[:, None] + pred_oh.sum(0)[None, :]  # [N, M]
+    union = (true_oh.sum(0)[:, None] + pred_oh.sum(0)[None, :]) - intersect  # [N, M]
     iou = intersect / (union + 1e-8)  # [N, M]
     iou = iou.detach().cpu().numpy()
     # find the best match for each gt
